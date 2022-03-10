@@ -4,22 +4,17 @@ import java.util.ArrayList;
 
 public class Customer {
 
-	private CustomerID customerID;
 	private ArrayList<Account> accounts;
+	private String password;
 
-	public Customer(CustomerID customerID, ArrayList<Account> accounts) {
-		this.customerID = customerID;
+	public Customer(String password, ArrayList<Account> accounts) {
+		this.password = password;
 		this.accounts = accounts;
 	}
-
-	public Customer(CustomerID customerID) {
-		this(customerID, new ArrayList<>());
+	
+	public Customer(String password) {
+		this(password, new ArrayList<>());
 	}
-
-	public CustomerID getCustomerID() {
-		return customerID;
-	}
-
 	
 	public String accountsToString() {
 		String s = "";
@@ -27,6 +22,10 @@ public class Customer {
 			s += a.toString();
 		}
 		return s;
+	}
+
+	public Boolean checkPassword(String input){
+		return password.equals(input);
 	}
 
 	public void addAccount(Account account) {

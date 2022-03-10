@@ -14,21 +14,17 @@ public class NewBank {
 	}
 	
 	private void addTestData() {
-		CustomerID bhagyID = new CustomerID("Bhagy", "12345");
-		Customer bhagy = new Customer(bhagyID);
+		Customer bhagy = new Customer("bhagyPass");
 		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put(bhagy.getCustomerID().getKey(), bhagy);
-
-
-		CustomerID christinaID = new CustomerID("Christina", "23456");
-		Customer christina = new Customer(christinaID);
+		customers.put("Bhagy", bhagy);
+		
+		Customer christina = new Customer("christinaPass");
 		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put(christina.getCustomerID().getKey(), christina);
-
-		CustomerID johnID = new CustomerID("John", "34567");
-		Customer john = new Customer(johnID);
+		customers.put("Christina", christina);
+		
+		Customer john = new Customer("johnPass");
 		john.addAccount(new Account("Checking", 250.0));
-		customers.put(john.getCustomerID().getKey(), john);
+		customers.put("John", john);
 	}
 	
 	public static NewBank getBank() {
@@ -37,7 +33,9 @@ public class NewBank {
 	
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
 		if(customers.containsKey(userName)) {
-			return new CustomerID(userName);
+			if(customers.get(userName).checkPassword(password)){
+				return new CustomerID(userName);
+			}
 		}
 		return null;
 	}
