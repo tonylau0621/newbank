@@ -58,11 +58,10 @@ public class NewBank {
 	}
 
 	private String newAccount(CustomerID customer, String accountName) {
-		try {
+		if(customers.keySet().contains(customer.getKey())){
 			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
 			return "SUCCESS";
-		} catch (Exception e) { //TODO: Handle specific exceptions or change to use an if block
-			return "FAIL";
 		}
+		return "FAIL";
 	}
 }
