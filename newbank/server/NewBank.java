@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class NewBank {
 
-	//Testing
+
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
 	
@@ -14,17 +14,21 @@ public class NewBank {
 	}
 	
 	private void addTestData() {
-		Customer bhagy = new Customer();
+		CustomerID bhagyID = new CustomerID("Bhagy", "12345");
+		Customer bhagy = new Customer(bhagyID);
 		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put("Bhagy", bhagy);
-		
-		Customer christina = new Customer();
+		customers.put(bhagy.getCustomerID().getKey(), bhagy);
+
+
+		CustomerID christinaID = new CustomerID("Christina", "23456");
+		Customer christina = new Customer(christinaID);
 		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-		
-		Customer john = new Customer();
+		customers.put(christina.getCustomerID().getKey(), christina);
+
+		CustomerID johnID = new CustomerID("John", "34567");
+		Customer john = new Customer(johnID);
 		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
+		customers.put(john.getCustomerID().getKey(), john);
 	}
 	
 	public static NewBank getBank() {
