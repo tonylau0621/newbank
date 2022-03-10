@@ -5,9 +5,11 @@ import java.util.ArrayList;
 public class Customer {
 	
 	private ArrayList<Account> accounts;
+	private String password;
 	
-	public Customer() {
+	public Customer(String password) {
 		accounts = new ArrayList<>();
+		this.password = password;
 	}
 	
 	public String accountsToString() {
@@ -16,6 +18,10 @@ public class Customer {
 			s += a.toString();
 		}
 		return s;
+	}
+
+	public Boolean checkPassword(String input){
+		return password.equals(input);
 	}
 
 	public void addAccount(Account account) {
