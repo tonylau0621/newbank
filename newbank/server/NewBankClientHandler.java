@@ -38,13 +38,13 @@ public class NewBankClientHandler extends Thread{
 				while(true) {
 					String input = in.readLine();
 					String terms[] = input.split(" ");
-					String requestType = terms[0];
-					String requestData[] = {};
+					String request = terms[0];
+					String arguments[] = {};
 					if(terms.length > 1){
-						requestData = Arrays.copyOfRange(terms, 1, terms.length);
+						arguments = Arrays.copyOfRange(terms, 1, terms.length);
 					}
 					System.out.println("Request from " + customer.getKey());
-					String response = bank.processRequest(customer, requestType, requestData);
+					String response = bank.processRequest(customer, request, arguments);
 					out.println(response);
 				}
 			}
