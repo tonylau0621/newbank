@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class NewBankClientHandler extends Thread{
 	
@@ -38,11 +39,9 @@ public class NewBankClientHandler extends Thread{
 					String input = in.readLine();
 					String terms[] = input.split(" ");
 					String requestType = terms[0];
-					String requestData = "";
-					try { 
-						requestData = terms[1];
-					} catch (Exception e) {
-						//TODO: handle exception
+					String requestData[] = {};
+					if(terms.length > 1){
+						requestData = Arrays.copyOfRange(terms, 1, terms.length);
 					}
 					System.out.println("Request from " + customer.getKey());
 					String response = bank.processRequest(customer, requestType, requestData);

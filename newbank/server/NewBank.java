@@ -39,13 +39,13 @@ public class NewBank {
 	}
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String requestType, String requestData) {
+	public synchronized String processRequest(CustomerID customer, String requestType, String[] requestData) {
 		if(customers.containsKey(customer.getKey())) {
 			switch(requestType) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 			case "NEWACCOUNT" : 
-			if(requestData != ""){
-				return newAccount(customer, requestData);
+			if(requestData.length > 0){
+				return newAccount(customer, requestData[0]);
 			}
 			default : return "FAIL";
 			}
