@@ -14,18 +14,18 @@ public class NewBank {
 	}
 	
 	private void addTestData() {
-		CustomerID bhagyID = new CustomerID("Bhagy", "12345");
+		CustomerID bhagyID = new CustomerID("Bhagy", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		Customer bhagy = new Customer(bhagyID);
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put(bhagy.getCustomerID().getKey(), bhagy);
 
 
-		CustomerID christinaID = new CustomerID("Christina", "23456");
+		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
 		Customer christina = new Customer(christinaID);
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put(christina.getCustomerID().getKey(), christina);
 
-		CustomerID johnID = new CustomerID("John", "34567");
+		CustomerID johnID = new CustomerID("John", "johnPass");
 		Customer john = new Customer(johnID);
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put(john.getCustomerID().getKey(), john);
@@ -36,7 +36,9 @@ public class NewBank {
 	}
 	
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
+		// some dummy code demonstrating how to check password.
+		Customer customer = customers.get(userName);
+		if(customer != null && customer.getCustomerID().checkPassword(password)) {
 			return new CustomerID(userName);
 		}
 		return null;
