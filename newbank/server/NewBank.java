@@ -48,7 +48,7 @@ public class NewBank {
 				newAccount(customer, request.split("\\s+")[1]);
 				return "SUCCESS";
 			} catch (ArrayIndexOutOfBoundsException e) {
-				System.out.println("Account name not provided.");
+				//TODO: Handle exception, possibly just print to the server console/write to a server log
 			}
 			default : return "FAIL";
 			}
