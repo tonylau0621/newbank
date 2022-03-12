@@ -39,7 +39,7 @@ public class NewBank {
 		// some dummy code demonstrating how to check password.
 		Customer customer = customers.get(userName);
 		if(customer != null && customer.getCustomerID().checkPassword(password)) {
-			return new CustomerID(userName);
+			return customer.getCustomerID();
 		}
 		return null;
 	}
