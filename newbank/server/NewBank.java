@@ -39,13 +39,16 @@ public class NewBank {
 	}
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request, String[] arguments) {
+	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
-			switch(request) {
+			switch(request.split("\\s+")[0]) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 			case "NEWACCOUNT" : 
-			if(arguments.length > 0){
-				return newAccount(customer, arguments[0]);
+			try {
+				newAccount(customer, request.split("\\s+")[1]);
+				return "SUCCESS";
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("Account name not provided.");
 			}
 			default : return "FAIL";
 			}
