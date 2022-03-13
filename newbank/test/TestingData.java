@@ -95,6 +95,15 @@ public class TestingData {
     );
   }
 
+  public static Stream<Arguments> providUserNameAndWrongOldPasswordAndNewPassword() {
+    return Stream.of(
+            Arguments.of("Bhagy", "bhagyPass1", "12345"),
+            Arguments.of("Christina", "passChristina", "abcde"),
+            Arguments.of("John", "JohnPass", "newPassJohn")
+    );
+  }
+
+
   // End of testing data
 
 }

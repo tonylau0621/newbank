@@ -5,6 +5,7 @@ import newbank.server.CustomerID;
 import newbank.server.NewBank;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -18,6 +19,10 @@ public class CustomerIDTest {
 
   @BeforeAll
   public static void setup() {
+  }
+
+  @BeforeEach
+  public void setupEachTime() {
     TestingData.setup();
     bank = TestingData.bank;
     customers = TestingData.customers;
@@ -41,9 +46,15 @@ public class CustomerIDTest {
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#providUserNameAndCorrectOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithCorrectOldPassword(String username, String oldPassword, String newPassword) {
-    customers.get(username).getCustomerID().setPassword(oldPassword, newPassword);
+    Assertions.assertTrue(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
     Assertions.assertTrue(customers.get(username).getCustomerID().checkPassword(newPassword));
-    Assertions.assertFalse(customers.get(username).getCustomerID().checkPassword(oldPassword));
+  }
+
+  @ParameterizedTest
+  @MethodSource("newbank.test.TestingData#providUserNameAndWrongOldPasswordAndNewPassword")
+  public void testCustomerIDsetPasswordMethodWithWrongOldPassword(String username, String oldPassword, String newPassword) {
+    Assertions.assertFalse(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
+    //Assertions.assertFalse(customers.get(username).getCustomerID().checkPassword(newPassword));
   }
 
 }
