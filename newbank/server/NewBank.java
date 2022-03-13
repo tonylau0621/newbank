@@ -53,4 +53,21 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	// payAmount: Takes two accounts and an amount as input
+	public static void payAmount(Customer receivingAccount, Customer payingAccount, int Amount) {
+		// getBalance checks the current balance for the payingAccount Customer
+		int balance = receivingAccount.getBalance();
+		if(balance > Amount) {
+			// setBalance changes the current balance for the payingAccount Customer
+			receivingAccount.setBalance((balance-Amount));
+			new_balance = receivingAccount.getBalance()
+			System.out.println("Payment was successful. New Balance:");
+			System.out.println(new_balance);
+		}
+		else {
+			System.out.println("Insufficient balance.");
+		}
+
+	}
+
 }
