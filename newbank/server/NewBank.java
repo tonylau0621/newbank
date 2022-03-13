@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class NewBank {
 
-	//Testing
+
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
 	
@@ -14,26 +14,32 @@ public class NewBank {
 	}
 	
 	private void addTestData() {
-		Customer bhagy = new Customer();
+		CustomerID bhagyID = new CustomerID("Bhagy", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+		Customer bhagy = new Customer(bhagyID);
 		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put("Bhagy", bhagy);
-		
-		Customer christina = new Customer();
+		customers.put(bhagy.getCustomerID().getKey(), bhagy);
+
+
+		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
+		Customer christina = new Customer(christinaID);
 		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-		
-		Customer john = new Customer();
+		customers.put(christina.getCustomerID().getKey(), christina);
+
+		CustomerID johnID = new CustomerID("John", "johnPass");
+		Customer john = new Customer(johnID);
 		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
+		customers.put(john.getCustomerID().getKey(), john);
 	}
 	
 	public static NewBank getBank() {
 		return bank;
 	}
-	
+
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		if(customers.containsKey(userName)) {
-			return new CustomerID(userName);
+		// some dummy code demonstrating how to check password.
+		Customer customer = customers.get(userName);
+		if(customer != null && customer.getCustomerID().checkPassword(password)) {
+			return customer.getCustomerID();
 		}
 		return null;
 	}
