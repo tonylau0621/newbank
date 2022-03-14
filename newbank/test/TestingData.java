@@ -44,6 +44,8 @@ public class TestingData {
   }
 
   // Testing data
+
+  // Data for login
   public static Stream<Arguments> provideCorrectUsernameAndPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyPass"),
@@ -65,6 +67,24 @@ public class TestingData {
     );
   }
 
+  public static Stream<Arguments> provideUsernameAndCorrectOldPasswordAndNewPassword() {
+    return Stream.of(
+            Arguments.of("Bhagy", "bhagyPass", "12345"),
+            Arguments.of("Christina", "christinaPass", "abcde"),
+            Arguments.of("John", "johnPass", "newPassJohn")
+    );
+  }
+
+  public static Stream<Arguments> provideUsernameAndWrongOldPasswordAndNewPassword() {
+    return Stream.of(
+            Arguments.of("Bhagy", "bhagyPass1", "12345"),
+            Arguments.of("Christina", "passChristina", "abcde"),
+            Arguments.of("John", "JohnPass", "newPassJohn")
+    );
+  }
+  // End of data for login
+
+  // Data for NEWACCOUNT
   public static Stream<Arguments> provideCustomerIDAndValidNewAccountCommand() {
     String[] commands = {"NEWACCOUNT Current", "NEWACCOUNT Investment", "NEWACCOUNT Pension"};
     Stream<Arguments> stream = Stream.of();
@@ -86,7 +106,9 @@ public class TestingData {
     }
     return stream;
   }
+  // End of data for NEWACCOUNT
 
+  // Data for MOVE
   // Assume customer has the corresponding accounts and enough balance.
   public static Stream<Arguments> provideCustomerIDAndValidMoveCommand() {
     String[] commands = {"MOVE 100 TestingAccount1 TestingAccount2", "MOVE 75 Main Savings", "MOVE 14.9 Investment Current"};
@@ -99,23 +121,55 @@ public class TestingData {
     return stream;
   }
 
-
-  public static Stream<Arguments> provideUserNameAndCorrectOldPasswordAndNewPassword() {
-    return Stream.of(
-            Arguments.of("Bhagy", "bhagyPass", "12345"),
-            Arguments.of("Christina", "christinaPass", "abcde"),
-            Arguments.of("John", "johnPass", "newPassJohn")
-    );
+  public static Stream<Arguments> provideCustomerIDAndInvalidMoveCommand() {
+    String[] commands = {"MOVE 100 TestingAccount1", "MOVE 3ab Main Savings", "14.9 Investment Current", "MOVE Investment Current 170",
+            "MOVE 300 NotExistsAccount1 Main", "MOVE 50 NotExistsAccount1 NotExistsAccount2"};
+    Stream<Arguments> stream = Stream.of();
+    for (int i = 0; i < customersID.size(); i++) {
+      for (int j = 0; j < commands.length; j++) {
+        stream = Stream.concat(stream, Stream.of(Arguments.of(customersID.get(i), commands[j])));
+      }
+    }
+    return stream;
   }
 
-  public static Stream<Arguments> provideUserNameAndWrongOldPasswordAndNewPassword() {
-    return Stream.of(
-            Arguments.of("Bhagy", "bhagyPass1", "12345"),
-            Arguments.of("Christina", "passChristina", "abcde"),
-            Arguments.of("John", "JohnPass", "newPassJohn")
-    );
+  // Assume customer has the corresponding accounts.
+  public static Stream<Arguments> provideCustomerIDAndInvalidMoveCommandWithInvalidAmount() {
+    String[] commands = {"MOVE -100 TestingAccount1 TestingAccount2", "MOVE -26.9 Main Savings", "MOVE 0 Investment Current"};
+    Stream<Arguments> stream = Stream.of();
+    for (int i = 0; i < customersID.size(); i++) {
+      for (int j = 0; j < commands.length; j++) {
+        stream = Stream.concat(stream, Stream.of(Arguments.of(customersID.get(i), commands[j])));
+      }
+    }
+    return stream;
+  }
+  //End of data for MOVE
+
+  // Data for PAY
+  // Assume customer has enough balance.
+  public static Stream<Arguments> provideCustomerIDAndValidPayCommand() {
+    String[] commands = {"PAY John 100", "PAY Christina 36.7", "PAY Bhagy 0.08"};
+    Stream<Arguments> stream = Stream.of();
+    for (int i = 0; i < customersID.size(); i++) {
+      for (int j = 0; j < commands.length; j++) {
+        stream = Stream.concat(stream, Stream.of(Arguments.of(customersID.get(i), commands[j])));
+      }
+    }
+    return stream;
   }
 
+  public static Stream<Arguments> provideCustomerIDAndInvalidPayCommand() {
+    String[] commands = {"PAY John 9999999", "PAY Christina -150", "PAY Bhagy 0", "PAY Peter 11.6", "PAY Christina -53.9"};
+    Stream<Arguments> stream = Stream.of();
+    for (int i = 0; i < customersID.size(); i++) {
+      for (int j = 0; j < commands.length; j++) {
+        stream = Stream.concat(stream, Stream.of(Arguments.of(customersID.get(i), commands[j])));
+      }
+    }
+    return stream;
+  }
+  // End of data for PAY
 
   // End of testing data
 

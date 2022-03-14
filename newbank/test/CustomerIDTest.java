@@ -44,14 +44,14 @@ public class CustomerIDTest {
   }
 
   @ParameterizedTest
-  @MethodSource("newbank.test.TestingData#provideUserNameAndCorrectOldPasswordAndNewPassword")
+  @MethodSource("newbank.test.TestingData#provideUsernameAndCorrectOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithCorrectOldPassword(String username, String oldPassword, String newPassword) {
     Assertions.assertTrue(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
     Assertions.assertTrue(customers.get(username).getCustomerID().checkPassword(newPassword));
   }
 
   @ParameterizedTest
-  @MethodSource("newbank.test.TestingData#provideUserNameAndWrongOldPasswordAndNewPassword")
+  @MethodSource("newbank.test.TestingData#provideUsernameAndWrongOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithWrongOldPassword(String username, String oldPassword, String newPassword) {
     Assertions.assertFalse(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
     //Assertions.assertFalse(customers.get(username).getCustomerID().checkPassword(newPassword));
