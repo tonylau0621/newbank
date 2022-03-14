@@ -1,5 +1,6 @@
 package newbank.test;
 
+import newbank.server.Account;
 import newbank.server.Customer;
 import newbank.server.CustomerID;
 import newbank.server.NewBank;
@@ -49,26 +50,74 @@ public class NewBankTest {
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndValidNewAccountCommand")
   public void validNewAccountCommand(CustomerID customerID, String command) {
     bank.processRequest(customerID, command);
+    Customer customer = customers.get(customerID.getKey());
+    ArrayList<Account> accounts = customer.getAccounts();
     String accountType = command.split("\\s+")[1];
-    Assertions.assertTrue(customers.get(customerID.getKey()).accountsToString().contains(accountType));
+    for (int i = 0; i < accounts.size(); i++) {
+      if (accounts.get(i).getAccountName().equals(accountType) && accounts.get(i).getOpeningBalance() == 0.0) {
+        return;
+      }
+    }
+    fail(customerID.getFirstName() + "'s " + accountType + " account not found/not probably set.");
   }
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidNewAccountCommand")
   public void invalidNewAccountCommand(CustomerID customerID, String command) {
-    bank.processRequest(customerID, command);
-    if (command.split("\\s+").length > 1) {
-      String accountType = command.split("\\s+")[1];
-      Assertions.assertFalse(customers.get(customerID.getKey()).accountsToString().contains(accountType));
-    } else {
-      return;
+    Customer customer = customers.get(customerID.getKey());
+
+    // Deep copy
+    ArrayList<Account> accountsBeforeCommand = new ArrayList<>();
+    for (int i = 0; i < customer.getAccounts().size(); i++) {
+      accountsBeforeCommand.add(new Account(customer.getAccounts().get(i).getAccountName(), customer.getAccounts().get(i).getOpeningBalance()));
     }
 
+    bank.processRequest(customerID, command);
+    ArrayList<Account> accountsAfterCommand = customer.getAccounts();
+    Assertions.assertEquals(accountsBeforeCommand.size(), accountsAfterCommand.size());
+    for (int i = 0; i < accountsBeforeCommand.size(); i++) {
+      Assertions.assertEquals(accountsBeforeCommand.get(i).getAccountName(), accountsAfterCommand.get(i).getAccountName());
+      Assertions.assertEquals(accountsBeforeCommand.get(i).getOpeningBalance(), accountsAfterCommand.get(i).getOpeningBalance());
+    }
   }
 
-  @Test
-  public void validMoveCommand() {
-    fail("The test has not been implemented yet.");
+  // Assume customer has the corresponding accounts and enough balance.
+  @ParameterizedTest
+  @MethodSource("newbank.test.TestingData#provideCustomerIDAndValidMoveCommand")
+  public void validMoveCommand(CustomerID customerID, String command) {
+    String[] commands = command.split("\\s+");
+    Double amount = Double.parseDouble(commands[1]);
+    String account1Name = commands[2];
+    String account2Name = commands[3];
+    Customer customer = customers.get(customerID.getKey());
+    ArrayList<Account> accounts = customer.getAccounts();
+    Account account1 = null;
+    Account account2 = null;
+    for (int i = 0; i < accounts.size(); i++) {
+      if (accounts.get(i).getAccountName().equals(account1Name)) {
+        account1 = accounts.get(i);
+      }
+      if (accounts.get(i).getAccountName().equals(account2Name)) {
+        account2 = accounts.get(i);
+      }
+    }
+    if (account1 == null) {
+      account1 = new Account(account1Name, 9999.0);
+      customer.addAccount(account1);
+    }
+    if (account2 == null) {
+      account2 = new Account(account1Name, 9999.0);
+      customer.addAccount(account2);
+    }
+
+    Double account1OldBalance = account1.getOpeningBalance();
+    Double account2OldBalance = account2.getOpeningBalance();
+
+    bank.processRequest(customerID, command);
+
+    Assertions.assertEquals(account1OldBalance - amount, account1.getOpeningBalance());
+    Assertions.assertEquals(account2OldBalance + amount, account2.getOpeningBalance());
+
   }
 
   @Test

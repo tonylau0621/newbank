@@ -19,6 +19,10 @@ public class Customer {
 	public CustomerID getCustomerID() {
 		return customerID;
 	}
+
+	public ArrayList<Account> getAccounts() {
+		return accounts;
+	}
 	
 	public String accountsToString() {
 		String s = "";

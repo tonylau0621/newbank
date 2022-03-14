@@ -87,7 +87,20 @@ public class TestingData {
     return stream;
   }
 
-  public static Stream<Arguments> providUserNameAndCorrectOldPasswordAndNewPassword() {
+  // Assume customer has the corresponding accounts and enough balance.
+  public static Stream<Arguments> provideCustomerIDAndValidMoveCommand() {
+    String[] commands = {"MOVE 100 TestingAccount1 TestingAccount2", "MOVE 75 Main Savings", "MOVE 14.9 Investment Current"};
+    Stream<Arguments> stream = Stream.of();
+    for (int i = 0; i < customersID.size(); i++) {
+      for (int j = 0; j < commands.length; j++) {
+        stream = Stream.concat(stream, Stream.of(Arguments.of(customersID.get(i), commands[j])));
+      }
+    }
+    return stream;
+  }
+
+
+  public static Stream<Arguments> provideUserNameAndCorrectOldPasswordAndNewPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyPass", "12345"),
             Arguments.of("Christina", "christinaPass", "abcde"),
@@ -95,7 +108,7 @@ public class TestingData {
     );
   }
 
-  public static Stream<Arguments> providUserNameAndWrongOldPasswordAndNewPassword() {
+  public static Stream<Arguments> provideUserNameAndWrongOldPasswordAndNewPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyPass1", "12345"),
             Arguments.of("Christina", "passChristina", "abcde"),
