@@ -1,9 +1,6 @@
 package newbank.test;
 
-import newbank.server.Account;
-import newbank.server.Customer;
-import newbank.server.CustomerID;
-import newbank.server.NewBank;
+import newbank.server.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,16 +32,23 @@ public class NewBankTest {
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCorrectUsernameAndPassword")
   public void logInWithCorrectUsernameAndPassword(String username, String password) {
-    CustomerID customerID = bank.checkLogInDetails(username, password);
-    Assertions.assertNotNull(customerID);
-    Assertions.assertEquals(username, customerID.getKey());
+    try {
+      CustomerID customerID = bank.checkLogInDetails(username, password);
+      Assertions.assertEquals(username, customerID.getKey());
+    } catch (InvalidUserNameException | InvalidPasswordException e) {
+      fail("Correct username and password but login fail");
+    }
   }
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideWrongUsernameAndPassword")
   public void logInWithWrongUsernameAndPassword(String username, String password) {
-    CustomerID customerID = bank.checkLogInDetails(username, password);
-    Assertions.assertNull(customerID);
+    try {
+      CustomerID customerID = bank.checkLogInDetails(username, password);
+    } catch (InvalidUserNameException | InvalidPasswordException e) {
+      return;
+    }
+    fail("Logged in with wrong username and/or password");
   }
   // End of Tests for login
 

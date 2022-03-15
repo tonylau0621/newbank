@@ -35,13 +35,14 @@ public class NewBank {
 		return bank;
 	}
 
-	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		// some dummy code demonstrating how to check password.
-		Customer customer = customers.get(userName);
-		if(customer != null && customer.getCustomerID().checkPassword(password)) {
-			return customer.getCustomerID();
-		}
-		return null;
+	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+		boolean isValidUserName = (customers.containsKey(userName));
+		if(!isValidUserName) throw new InvalidUserNameException();
+		Customer targetCustomer = customers.get(userName);
+		CustomerID targetCustomerId = targetCustomer.getCustomerID();
+		boolean isValidPassword = (targetCustomerId.checkPassword(password));
+		if(!isValidPassword) throw new InvalidPasswordException();
+		return targetCustomerId;
 	}
 
 	// commands from the NewBank customer are processed in this method
