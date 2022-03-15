@@ -37,7 +37,18 @@ public class NewBankClientHandler extends Thread{
 				while(true) {
 					String request = in.readLine();
 					System.out.println("Request from " + customer.getKey());
-					String response = bank.processRequest(customer, request);
+					String response = "";
+					switch (request){
+						case "SHOWMYACCOUNTS" : {
+							response = bank.processRequest(customer, request, null);
+							break;
+						}
+						case "MOVE" : 
+						{
+							response = runMove(customer);
+							break;
+						}
+					}
 					out.println(response);
 				}
 			}
@@ -58,4 +69,27 @@ public class NewBankClientHandler extends Thread{
 		}
 	}
 
+	public String runMove(CustomerID customer){
+		try{
+			out.println("From:");
+			String from = in.readLine();
+			out.println("To:");
+			String to = in.readLine();
+			out.println("Amount:");
+			double amount = 0;
+			try{
+				amount = Double.valueOf(in.readLine());
+			}catch(NumberFormatException ne){
+				ne.printStackTrace();
+			}
+			String[] parameters = new String[3];
+			parameters[0] = String.valueOf(amount);
+			parameters[1] = from;
+			parameters[2] = to;
+			return bank.processRequest(customer, "MOVE", parameters);
+		}catch (IOException e) {
+			e.printStackTrace();
+			return "FAIL";
+		}
+	}
 }

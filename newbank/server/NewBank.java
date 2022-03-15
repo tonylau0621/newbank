@@ -19,6 +19,7 @@ public class NewBank {
 		customers.put("Bhagy", bhagy);
 		
 		Customer christina = new Customer();
+		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
 		
@@ -38,19 +39,23 @@ public class NewBank {
 		return null;
 	}
 
+
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request) {
+	public synchronized String processRequest(CustomerID customer, String request, String[] additionalParameter) {
 		if(customers.containsKey(customer.getKey())) {
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 			//TODO: Talk about how to communicate with the handler.
+			case "MOVE" : return moveAmount(Double.valueOf(additionalParameter[0]), additionalParameter[1], additionalParameter[2], customer);
 			default : return "FAIL";
 			}
 		}
 		return "FAIL";
 	}
 
-	public String moveAmount(double amount, String from, String to, CustomerID customer){
+
+
+	private String moveAmount(double amount, String from, String to, CustomerID customer){
 		//Account does not exist
 		Customer target = customers.get(customer.getKey());
 		if (!target.accountsToString().contains(from) || !target.accountsToString().contains(to)){
