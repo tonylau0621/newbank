@@ -9,9 +9,8 @@ import java.net.UnknownHostException;
 
 public class ExampleClient extends Thread{
 
-	//push test
 	private Socket server;
-	private PrintWriter bankServerOut;	
+	private PrintWriter bankServerOut;
 	private BufferedReader userInput;
 	private Thread bankServerResponseThread;
 	
@@ -21,7 +20,7 @@ public class ExampleClient extends Thread{
 		bankServerOut = new PrintWriter(server.getOutputStream(), true); 
 		
 		bankServerResponseThread = new Thread() {
-			private BufferedReader bankServerIn = new BufferedReader(new InputStreamReader(server.getInputStream())); 
+			private BufferedReader bankServerIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
 			public void run() {
 				try {
 					while(true) {
@@ -36,22 +35,21 @@ public class ExampleClient extends Thread{
 		};
 		bankServerResponseThread.start();
 	}
-	
-	
+
 	public void run() {
 		while(true) {
 			try {
 				while(true) {
 					String command = userInput.readLine();
 					bankServerOut.println(command);
-				}				
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		new ExampleClient("localhost",14002).start();
 	}

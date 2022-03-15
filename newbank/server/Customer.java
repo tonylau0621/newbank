@@ -20,7 +20,6 @@ public class Customer {
 		return customerID;
 	}
 
-	
 	public String accountsToString() {
 		String s = "";
 		for(Account a : accounts) {
@@ -30,6 +29,6 @@ public class Customer {
 	}
 
 	public void addAccount(Account account) {
-		accounts.add(account);		
+		accounts.add(account);
 	}
 }

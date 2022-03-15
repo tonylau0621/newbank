@@ -22,11 +22,11 @@ public class CustomerID {
 	public CustomerID(String key, String password) {
 		this(key, password, "", "", "", "", "");
 	}
-	
+
 	public CustomerID(String key) {
 		this(key, "", "", "", "", "", "");
 	}
-	
+
 	public String getKey() {
 		return key;
 	}
