@@ -62,6 +62,11 @@ public class NewBank {
 			//return "Account does not exist";
 			return "FAIL";
 		}
+
+		//Negative amount
+		if (amount < 0){
+			return "FAIL";
+		}
 		//Not enough balance
 		if (target.getAccount(from).getAmount() < amount){
 			//return "Not enough amount in your account";
