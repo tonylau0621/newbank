@@ -14,4 +14,18 @@ public class Account {
 		return (accountName + ": " + openingBalance);
 	}
 
+	public void updateBalance(double amount){
+		this.openingBalance += amount;
+	}
+
+	public double getAmount(){
+		return this.openingBalance;
+	}
+
+	public String getAccount(){
+		return this.accountName;
+	}
+
+
+
 }

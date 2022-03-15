@@ -43,10 +43,29 @@ public class NewBank {
 		if(customers.containsKey(customer.getKey())) {
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
+			//TODO: Talk about how to communicate with the handler.
 			default : return "FAIL";
 			}
 		}
 		return "FAIL";
+	}
+
+	public String moveAmount(double amount, String from, String to, CustomerID customer){
+		//Account does not exist
+		Customer target = customers.get(customer.getKey());
+		if (!target.accountsToString().contains(from) || !target.accountsToString().contains(to)){
+			//return "Account does not exist";
+			return "FAIL";
+		}
+		//Not enough balance
+		if (target.getAccount(from).getAmount() < amount){
+			//return "Not enough amount in your account";
+			return "FAIL";
+		}
+		//Update the amount and return success
+		target.getAccount(from).updateBalance(-amount);
+		target.getAccount(to).updateBalance(amount);
+		return "SUCCESS";
 	}
 	
 	private String showMyAccounts(CustomerID customer) {
