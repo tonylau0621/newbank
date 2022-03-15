@@ -1,12 +1,17 @@
 package newbank.server;
 
+// Only user for testing
+//import java.util.ArrayList;
 import java.util.HashMap;
 
+// Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
-
 
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
+
+	// Only use for testing
+	//public ArrayList<CustomerID> customersID;
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -29,6 +34,14 @@ public class NewBank {
 		Customer john = new Customer(johnID);
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put(john.getCustomerID().getKey(), john);
+
+		/*
+		// Only use for testing
+		customersID = new ArrayList<>();
+		customersID.add(bhagyID);
+		customersID.add(christinaID);
+		customersID.add(johnID);
+		*/
 	}
 
 	public static NewBank getBank() {
@@ -74,5 +87,12 @@ public class NewBank {
 		}
 		return "FAIL";
 	}
+
+	/*
+	// Only use for testing
+	public HashMap<String,Customer> getCustomers() {
+		return customers;
+	}
+	*/
 }
 

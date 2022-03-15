@@ -20,6 +20,15 @@ public class Customer {
 		return customerID;
 	}
 
+	public ArrayList<Account> getAccounts() {
+		// Deep copy
+		ArrayList<Account> accountsCopy = new ArrayList<>();
+		for (int i = 0; i < accounts.size(); i++) {
+			accountsCopy.add(new Account(accounts.get(i).getAccountName(), accounts.get(i).getOpeningBalance()));
+		}
+		return accountsCopy;
+	}
+
 	public String accountsToString() {
 		String s = "";
 		for(Account a : accounts) {
