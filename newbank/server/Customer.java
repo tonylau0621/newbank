@@ -24,7 +24,7 @@ public class Customer {
 		// Deep copy
 		ArrayList<Account> accountsCopy = new ArrayList<>();
 		for (int i = 0; i < accounts.size(); i++) {
-			accountsCopy.add(new Account(accounts.get(i).getAccountName(), accounts.get(i).getOpeningBalance()));
+			accountsCopy.add(new Account(accounts.get(i).getAccount(), accounts.get(i).getAmount()));
 		}
 		return accountsCopy;
 	}
@@ -39,5 +39,14 @@ public class Customer {
 
 	public void addAccount(Account account) {
 		accounts.add(account);
+	}
+
+	public Account getAccount(String name){
+		for (int i = 0; i < accounts.size(); i++){
+			if (accounts.get(i).getAccount().equals(name)){
+				return accounts.get(i);
+			}
+		}
+		return null;
 	}
 }

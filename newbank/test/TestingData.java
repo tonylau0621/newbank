@@ -20,8 +20,9 @@ public class TestingData {
     bank = NewBank.getBank();
 
     // In order to do the test, please make "Only use for testing" method/block/statement in NewBank class available.
-    customers = bank.getCustomers();
-    customersID = bank.customersID;
+    // Also make the following available.
+    //customers = bank.getCustomers();
+    //customersID = bank.customersID;
   }
 
   // Testing data

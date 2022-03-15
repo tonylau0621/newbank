@@ -62,7 +62,7 @@ public class NewBankTest {
     ArrayList<Account> accounts = customer.getAccounts();
     String accountType = command.split("\\s+")[1];
     for (int i = 0; i < accounts.size(); i++) {
-      if (accounts.get(i).getAccountName().equals(accountType) && accounts.get(i).getOpeningBalance() == 0.0) {
+      if (accounts.get(i).getAccount().equals(accountType) && accounts.get(i).getAmount() == 0.0) {
         return;
       }
     }
@@ -80,7 +80,7 @@ public class NewBankTest {
     // for deep copy
     ArrayList<Account> accountsBeforeCommand = new ArrayList<>();
     for (int i = 0; i < customer.getAccounts().size(); i++) {
-      accountsBeforeCommand.add(new Account(customer.getAccounts().get(i).getAccountName(), customer.getAccounts().get(i).getOpeningBalance()));
+      accountsBeforeCommand.add(new Account(customer.getAccounts().get(i).getAccount(), customer.getAccounts().get(i).getAmount()));
     }
     */
 
@@ -88,8 +88,8 @@ public class NewBankTest {
     ArrayList<Account> accountsAfterCommand = customer.getAccounts();
     Assertions.assertEquals(accountsBeforeCommand.size(), accountsAfterCommand.size());
     for (int i = 0; i < accountsBeforeCommand.size(); i++) {
-      Assertions.assertEquals(accountsBeforeCommand.get(i).getAccountName(), accountsAfterCommand.get(i).getAccountName());
-      Assertions.assertEquals(accountsBeforeCommand.get(i).getOpeningBalance(), accountsAfterCommand.get(i).getOpeningBalance());
+      Assertions.assertEquals(accountsBeforeCommand.get(i).getAccount(), accountsAfterCommand.get(i).getAccount());
+      Assertions.assertEquals(accountsBeforeCommand.get(i).getAmount(), accountsAfterCommand.get(i).getAmount());
     }
   }
   // End of tests for NEWACCOUNT
@@ -109,10 +109,10 @@ public class NewBankTest {
     Account account1 = null;
     Account account2 = null;
     for (int i = 0; i < accounts.size(); i++) {
-      if (accounts.get(i).getAccountName().equals(account1Name)) {
+      if (accounts.get(i).getAccount().equals(account1Name)) {
         account1 = accounts.get(i);
       }
-      if (accounts.get(i).getAccountName().equals(account2Name)) {
+      if (accounts.get(i).getAccount().equals(account2Name)) {
         account2 = accounts.get(i);
       }
     }
@@ -125,13 +125,13 @@ public class NewBankTest {
       customer.addAccount(account2);
     }
 
-    Double account1OldBalance = account1.getOpeningBalance();
-    Double account2OldBalance = account2.getOpeningBalance();
+    Double account1OldBalance = account1.getAmount();
+    Double account2OldBalance = account2.getAmount();
 
     Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
 
-    Assertions.assertEquals(account1OldBalance - amount, account1.getOpeningBalance());
-    Assertions.assertEquals(account2OldBalance + amount, account2.getOpeningBalance());
+    Assertions.assertEquals(account1OldBalance - amount, account1.getAmount());
+    Assertions.assertEquals(account2OldBalance + amount, account2.getAmount());
 
   }
 
@@ -154,10 +154,10 @@ public class NewBankTest {
     Account account1 = null;
     Account account2 = null;
     for (int i = 0; i < accounts.size(); i++) {
-      if (accounts.get(i).getAccountName().equals(account1Name)) {
+      if (accounts.get(i).getAccount().equals(account1Name)) {
         account1 = accounts.get(i);
       }
-      if (accounts.get(i).getAccountName().equals(account2Name)) {
+      if (accounts.get(i).getAccount().equals(account2Name)) {
         account2 = accounts.get(i);
       }
     }
@@ -170,13 +170,13 @@ public class NewBankTest {
       customer.addAccount(account2);
     }
 
-    Double account1OldBalance = account1.getOpeningBalance();
-    Double account2OldBalance = account2.getOpeningBalance();
+    Double account1OldBalance = account1.getAmount();
+    Double account2OldBalance = account2.getAmount();
 
     Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
 
-    Assertions.assertEquals(account1OldBalance, account1.getOpeningBalance());
-    Assertions.assertEquals(account2OldBalance, account2.getOpeningBalance());
+    Assertions.assertEquals(account1OldBalance, account1.getAmount());
+    Assertions.assertEquals(account2OldBalance, account2.getAmount());
 
   }
   // End of tests for MOVE
@@ -210,7 +210,7 @@ public class NewBankTest {
   public Double calculateTotalAmount(ArrayList<Account> accounts) {
     Double totalAmount = 0.0;
     for (int i = 0; i < accounts.size(); i++) {
-      totalAmount += accounts.get(i).getOpeningBalance();
+      totalAmount += accounts.get(i).getAmount();
     }
     return totalAmount;
   }
@@ -239,16 +239,16 @@ public class NewBankTest {
     ArrayList<Account> payerAccountsAfterCommand = payer.getAccounts();
     Assertions.assertEquals(payerAccounts.size(), payerAccountsAfterCommand.size());
     for (int i = 0; i < payerAccounts.size(); i++) {
-      Assertions.assertEquals(payerAccounts.get(i).getAccountName(), payerAccountsAfterCommand.get(i).getAccountName());
-      Assertions.assertEquals(payerAccounts.get(i).getOpeningBalance(), payerAccountsAfterCommand.get(i).getOpeningBalance());
+      Assertions.assertEquals(payerAccounts.get(i).getAccount(), payerAccountsAfterCommand.get(i).getAccount());
+      Assertions.assertEquals(payerAccounts.get(i).getAmount(), payerAccountsAfterCommand.get(i).getAmount());
     }
 
     if (receiver != null) {
       ArrayList<Account> receiverAccountsAfterCommand = receiver.getAccounts();
       Assertions.assertEquals(receiverAccounts.size(), receiverAccountsAfterCommand.size());
       for (int i = 0; i < receiverAccounts.size(); i++) {
-        Assertions.assertEquals(receiverAccounts.get(i).getAccountName(), receiverAccountsAfterCommand.get(i).getAccountName());
-        Assertions.assertEquals(receiverAccounts.get(i).getOpeningBalance(), receiverAccountsAfterCommand.get(i).getOpeningBalance());
+        Assertions.assertEquals(receiverAccounts.get(i).getAccount(), receiverAccountsAfterCommand.get(i).getAccount());
+        Assertions.assertEquals(receiverAccounts.get(i).getAmount(), receiverAccountsAfterCommand.get(i).getAmount());
       }
     }
   }

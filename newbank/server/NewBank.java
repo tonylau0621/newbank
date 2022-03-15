@@ -60,20 +60,45 @@ public class NewBank {
 
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
+		String[] requestTokens = request.split("\\s+");
+
 		if(customers.containsKey(customer.getKey())) {
-			switch(request.split("\\s+")[0]) {
-			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-			case "NEWACCOUNT" : 
-			try {
-				newAccount(customer, request.split("\\s+")[1]);
-				return "SUCCESS";
-			} catch (ArrayIndexOutOfBoundsException e) {
-				//TODO: Handle exception, possibly just print to the server console/write to a server log
-			}
-			default : return "FAIL";
+			switch(requestTokens[0]) {
+				case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
+				case "NEWACCOUNT" :
+					if (requestTokens.length > 0) {
+						return newAccount(customer, requestTokens[1]);
+					}
+				case "MOVE" :
+					if (requestTokens.length > 3) {
+						try {
+							return moveAmount(Double.parseDouble(requestTokens[1]), requestTokens[2], requestTokens[3], customer);
+						} catch (NumberFormatException e) {
+							return "FAIL";
+						}
+					}
+				default : return "FAIL";
 			}
 		}
 		return "FAIL";
+	}
+
+	public String moveAmount(double amount, String from, String to, CustomerID customer){
+		//Account does not exist
+		Customer target = customers.get(customer.getKey());
+		if (target.getAccount(from) == null || target.getAccount(to) == null){
+			//return "Account does not exist";
+			return "FAIL";
+		}
+		//Not enough balance
+		if (target.getAccount(from).getAmount() < amount){
+			//return "Not enough amount in your account";
+			return "FAIL";
+		}
+		//Update the amount and return success
+		target.getAccount(from).updateBalance(-amount);
+		target.getAccount(to).updateBalance(amount);
+		return "SUCCESS";
 	}
 
 	private String showMyAccounts(CustomerID customer) {
