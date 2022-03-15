@@ -41,8 +41,15 @@ public class NewBank {
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
-			switch(request) {
+			switch(request.split("\\s+")[0]) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
+			case "NEWACCOUNT" : 
+			try {
+				newAccount(customer, request.split("\\s+")[1]);
+				return "SUCCESS";
+			} catch (ArrayIndexOutOfBoundsException e) {
+				//TODO: Handle exception, possibly just print to the server console/write to a server log
+			}
 			default : return "FAIL";
 			}
 		}
@@ -53,4 +60,11 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	private String newAccount(CustomerID customer, String accountName) {
+		if(customers.keySet().contains(customer.getKey())){
+			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
+			return "SUCCESS";
+		}
+		return "FAIL";
+	}
 }
