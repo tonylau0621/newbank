@@ -69,6 +69,15 @@ public class NewBank {
 							return "FAIL";
 						}
 					}
+				case "PAY" :
+					if (requestTokens.length > 4) {
+						try {
+							return payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2],
+									(requestTokens[3]),requestTokens[4]);}
+						catch (Exception e) {
+							return "FAIL";
+						}
+					}
 				default : return "FAIL";
 			}
 		}
@@ -105,24 +114,41 @@ public class NewBank {
 		return "SUCCESS";
 	}
 
-	/* PAY command
+	// PAY command
+	//Do I want to use Accounts or Customers?
 	// payAmount: Takes two accounts and an amount as input
-	public void payAmount(Customer receivingAccount, Customer payingAccount, int Amount) {
-		// getBalance checks the current balance for the payingAccount Customer
-		int balance = receivingAccount.getBalance();
-		if(balance > Amount) {
-			// setBalance changes the current balance for the payingAccount Customer
-			receivingAccount.setBalance((balance-Amount));
-			new_balance = receivingAccount.getBalance()
-			System.out.println("Payment was successful. New Balance:");
-			System.out.println(new_balance);
+	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
+							 String receivingCustomerKey, String receivingAccount ) {
+		//Account does not exist
+		Customer payer = customers.get(payingCustomer.getKey());
+		Customer receiver = customers.get(receivingCustomerKey);
+
+		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
+			//return "Please check Accounts";
+			return "FAIL";
+		}
+		//Customers should not be able to transfer less than 0.01
+		if(amount < 0.01) {return "FAIl";}
+
+		//get Account Balance Amount
+		double balance = payer.getAccount(payingAccount).getAmount();
+		//Is there enough balance?
+		if(balance > amount) {
+			//Adjust balance for both accounts
+			payer.getAccount(payingAccount).updateBalance(-amount);
+			receiver.getAccount(receivingAccount).updateBalance(amount);
+
+			//updated_balance = payer.getAccount(payingAccount).getAmount();
+
+			//return "Payment was successful.";
+			return "SUCCESS";
 		}
 		else {
-			System.out.println("Insufficient balance.");
+			//return "Insufficient balance.";
+			return "FAIL";
 		}
 
 	}
-	*/
 
 	/*
 	// Only use for testing
