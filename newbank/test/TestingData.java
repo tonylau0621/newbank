@@ -19,7 +19,7 @@ public class TestingData {
   public static void setup() {
     bank = NewBank.getBank();
 
-    // In order to do testing, please make "Only use for testing" method/block/statement available.
+    // In order to do the test, please make "Only use for testing" method/block/statement in NewBank class available.
     customers = bank.getCustomers();
     customersID = bank.customersID;
   }
