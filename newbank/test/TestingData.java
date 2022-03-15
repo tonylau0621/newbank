@@ -21,6 +21,7 @@ public class TestingData {
 
     // In order to do the test, please make "Only use for testing" method/block/statement in NewBank class available.
     // Also make the following available.
+    //bank.resetTestData();
     //customers = bank.getCustomers();
     //customersID = bank.customersID;
   }

@@ -105,23 +105,14 @@ public class NewBankTest {
     String account1Name = commands[2];
     String account2Name = commands[3];
     Customer customer = customers.get(customerID.getKey());
-    ArrayList<Account> accounts = customer.getAccounts();
-    Account account1 = null;
-    Account account2 = null;
-    for (int i = 0; i < accounts.size(); i++) {
-      if (accounts.get(i).getAccount().equals(account1Name)) {
-        account1 = accounts.get(i);
-      }
-      if (accounts.get(i).getAccount().equals(account2Name)) {
-        account2 = accounts.get(i);
-      }
-    }
+    Account account1 = customer.getAccount(account1Name);
+    Account account2 = customer.getAccount(account2Name);
     if (account1 == null) {
       account1 = new Account(account1Name, 9999.0);
       customer.addAccount(account1);
     }
     if (account2 == null) {
-      account2 = new Account(account1Name, 9999.0);
+      account2 = new Account(account2Name, 9999.0);
       customer.addAccount(account2);
     }
 
@@ -144,29 +135,20 @@ public class NewBankTest {
   // Assume customer has the corresponding accounts.
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidMoveCommandWithInvalidAmount")
-  public void invalidMoveCommandWithInValidAmount(CustomerID customerID, String command) {
+  public void invalidMoveCommandWithInvalidAmount(CustomerID customerID, String command) {
     String[] commands = command.split("\\s+");
     Double amount = Double.parseDouble(commands[1]);
     String account1Name = commands[2];
     String account2Name = commands[3];
     Customer customer = customers.get(customerID.getKey());
-    ArrayList<Account> accounts = customer.getAccounts();
-    Account account1 = null;
-    Account account2 = null;
-    for (int i = 0; i < accounts.size(); i++) {
-      if (accounts.get(i).getAccount().equals(account1Name)) {
-        account1 = accounts.get(i);
-      }
-      if (accounts.get(i).getAccount().equals(account2Name)) {
-        account2 = accounts.get(i);
-      }
-    }
+    Account account1 = customer.getAccount(account1Name);
+    Account account2 = customer.getAccount(account2Name);
     if (account1 == null) {
       account1 = new Account(account1Name, 9999.0);
       customer.addAccount(account1);
     }
     if (account2 == null) {
-      account2 = new Account(account1Name, 9999.0);
+      account2 = new Account(account2Name, 9999.0);
       customer.addAccount(account2);
     }
 
@@ -216,7 +198,7 @@ public class NewBankTest {
   }
 
   @ParameterizedTest
-  @MethodSource("newbank.test.TestingData#provideCustomerIDAndValidPayCommand")
+  @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidPayCommand")
   public void invalidPayCommand(CustomerID customerID, String command) {
     String[] commands = command.split("\\s+");
     Customer payer = customers.get(customerID.getKey());

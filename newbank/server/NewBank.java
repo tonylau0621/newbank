@@ -34,14 +34,6 @@ public class NewBank {
 		Customer john = new Customer(johnID);
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put(john.getCustomerID().getKey(), john);
-
-		/*
-		// Only use for testing
-		customersID = new ArrayList<>();
-		customersID.add(bhagyID);
-		customersID.add(christinaID);
-		customersID.add(johnID);
-		*/
 	}
 
 	public static NewBank getBank() {
@@ -66,7 +58,7 @@ public class NewBank {
 			switch(requestTokens[0]) {
 				case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
 				case "NEWACCOUNT" :
-					if (requestTokens.length > 0) {
+					if (requestTokens.length > 1) {
 						return newAccount(customer, requestTokens[1]);
 					}
 				case "MOVE" :
@@ -83,7 +75,19 @@ public class NewBank {
 		return "FAIL";
 	}
 
-	public String moveAmount(double amount, String from, String to, CustomerID customer){
+	private String showMyAccounts(CustomerID customer) {
+		return (customers.get(customer.getKey())).accountsToString();
+	}
+
+	private String newAccount(CustomerID customer, String accountName) {
+		if(customers.keySet().contains(customer.getKey())){
+			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
+			return "SUCCESS";
+		}
+		return "FAIL";
+	}
+
+	private String moveAmount(double amount, String from, String to, CustomerID customer){
 		//Account does not exist
 		Customer target = customers.get(customer.getKey());
 		if (target.getAccount(from) == null || target.getAccount(to) == null){
@@ -101,23 +105,56 @@ public class NewBank {
 		return "SUCCESS";
 	}
 
-	private String showMyAccounts(CustomerID customer) {
-		return (customers.get(customer.getKey())).accountsToString();
-	}
-
-	private String newAccount(CustomerID customer, String accountName) {
-		if(customers.keySet().contains(customer.getKey())){
-			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
-			return "SUCCESS";
+	/* PAY command
+	// payAmount: Takes two accounts and an amount as input
+	public void payAmount(Customer receivingAccount, Customer payingAccount, int Amount) {
+		// getBalance checks the current balance for the payingAccount Customer
+		int balance = receivingAccount.getBalance();
+		if(balance > Amount) {
+			// setBalance changes the current balance for the payingAccount Customer
+			receivingAccount.setBalance((balance-Amount));
+			new_balance = receivingAccount.getBalance()
+			System.out.println("Payment was successful. New Balance:");
+			System.out.println(new_balance);
 		}
-		return "FAIL";
+		else {
+			System.out.println("Insufficient balance.");
+		}
+
 	}
+	*/
 
 	/*
+	// Only use for testing
+	public void resetTestData() {
+		customers = new HashMap<>();
+		CustomerID bhagyID = new CustomerID("Bhagy", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+		Customer bhagy = new Customer(bhagyID);
+		bhagy.addAccount(new Account("Main", 1000.0));
+		customers.put(bhagy.getCustomerID().getKey(), bhagy);
+
+
+		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
+		Customer christina = new Customer(christinaID);
+		christina.addAccount(new Account("Savings", 1500.0));
+		customers.put(christina.getCustomerID().getKey(), christina);
+
+		CustomerID johnID = new CustomerID("John", "johnPass");
+		Customer john = new Customer(johnID);
+		john.addAccount(new Account("Checking", 250.0));
+		customers.put(john.getCustomerID().getKey(), john);
+
+		customersID = new ArrayList<>();
+		customersID.add(bhagyID);
+		customersID.add(christinaID);
+		customersID.add(johnID);
+	}
+
 	// Only use for testing
 	public HashMap<String,Customer> getCustomers() {
 		return customers;
 	}
 	*/
+
 }
 
