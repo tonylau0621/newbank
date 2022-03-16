@@ -9,9 +9,23 @@ public class Account {
 		this.accountName = accountName;
 		this.openingBalance = openingBalance;
 	}
-	
+
 	public String toString() {
 		return (accountName + ": " + openingBalance);
 	}
+
+	public void updateBalance(double amount){
+		this.openingBalance += amount;
+	}
+
+	public double getAmount(){
+		return this.openingBalance;
+	}
+
+	public String getAccount(){
+		return this.accountName;
+	}
+
+
 
 }

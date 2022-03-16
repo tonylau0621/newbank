@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class NewBankClientHandler extends Thread{
+public class NewBankClientHandler extends Thread {
 	
 	private NewBank bank;
 	private BufferedReader in;
@@ -22,32 +22,45 @@ public class NewBankClientHandler extends Thread{
 	public void run() {
 		// keep getting requests from the client and processing them
 		try {
-			// ask for user name
-			out.println("Enter Username");
-			String userName = in.readLine();
-			// ask for password
-			out.println("Enter Password");
-			String password = in.readLine();
-			out.println("Checking Details...");
-			// authenticate user and get customer ID token from bank for use in subsequent requests
-			CustomerID customer = bank.checkLogInDetails(userName, password);
-			// if the user is authenticated then get requests from the user and process them 
-			if(customer != null) {
-				out.println("Log In Successful. What do you want to do?");
-				while(true) {
-					String request = in.readLine();
-					System.out.println("Request from " + customer.getKey());
-					String response = bank.processRequest(customer, request);
-					out.println(response);
+			while (true) {
+				// ask for user name
+				out.println("Enter Username");
+				String userName = in.readLine();
+				// ask for password
+				out.println("Enter Password");
+				String password = in.readLine();
+				out.println("Checking Details...");
+				// authenticate user and get customer ID token from bank for use in subsequent requests
+				CustomerID customer = null;
+				try {
+					customer = bank.checkLogInDetails(userName, password);
+				} catch (InvalidUserNameException iue) {
+					out.println("Log In Failed");
+					out.println(iue.getMessage());
+				} catch (InvalidPasswordException ipe) {
+					out.println("Log In Failed");
+					out.println(ipe.getMessage());
 				}
-			}
-			else {
-				out.println("Log In Failed");
+				// if the user is authenticated then get requests from the user and process them
+				if (customer != null) {
+					out.println("Log In Successful. What do you want to do?");
+					while(true) {
+						String request = in.readLine();
+						System.out.println("Request from " + customer.getKey());
+						switch(request) {
+							case "MOVE" :
+								request = runMove(customer);
+								break;
+						}
+						String response = bank.processRequest(customer, request);
+						out.println(response);
+					}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
+			out.println("finally");
 			try {
 				in.close();
 				out.close();
@@ -56,6 +69,23 @@ public class NewBankClientHandler extends Thread{
 				Thread.currentThread().interrupt();
 			}
 		}
+	}
+
+	private String runMove(CustomerID customer){
+		try{
+			out.println("From:");
+			String from = in.readLine();
+			out.println("To:");
+			String to = in.readLine();
+			out.println("Amount:");
+			String amount = in.readLine();
+			if (!from.contains(" ") && !to.contains(" ") && !amount.contains(" ")) {
+				return "MOVE " + amount + " " + from + " " + to;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 }
