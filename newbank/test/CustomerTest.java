@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CustomerIDTest {
+public class CustomerTest {
   private static NewBank bank;
   private static HashMap<String, Customer> customers;
   private static ArrayList<CustomerID> customersID;
@@ -32,29 +32,29 @@ public class CustomerIDTest {
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCorrectUsernameAndPassword")
   public void testCustomerIDCheckPasswordMethodWithCorrectPassword(String username, String password) {
-    Assertions.assertTrue(customers.get(username).getCustomerID().checkPassword(password));
+    Assertions.assertTrue(customers.get(username).checkPassword(password));
   }
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideWrongUsernameAndPassword")
   public void testCustomerIDCheckPasswordMethodWithWrongPassword(String username, String password) {
     if (customers.get(username) != null) {
-      Assertions.assertFalse(customers.get(username).getCustomerID().checkPassword(password));
+      Assertions.assertFalse(customers.get(username).checkPassword(password));
     }
   }
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideUsernameAndCorrectOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithCorrectOldPassword(String username, String oldPassword, String newPassword) {
-    Assertions.assertTrue(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
-    Assertions.assertTrue(customers.get(username).getCustomerID().checkPassword(newPassword));
+    Assertions.assertTrue(customers.get(username).setPassword(oldPassword, newPassword));
+    Assertions.assertTrue(customers.get(username).checkPassword(newPassword));
   }
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideUsernameAndWrongOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithWrongOldPassword(String username, String oldPassword, String newPassword) {
-    Assertions.assertFalse(customers.get(username).getCustomerID().setPassword(oldPassword, newPassword));
-    //Assertions.assertFalse(customers.get(username).getCustomerID().checkPassword(newPassword));
+    Assertions.assertFalse(customers.get(username).setPassword(oldPassword, newPassword));
+    //Assertions.assertFalse(customers.get(username).checkPassword(newPassword));
   }
 
 }

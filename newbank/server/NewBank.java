@@ -19,23 +19,19 @@ public class NewBank {
 	}
 
 	private void addTestData() {
-		CustomerID bhagyID = new CustomerID("Bhagy", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
-		Customer bhagy = new Customer(bhagyID);
+		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put(bhagy.getCustomerID().getKey(), bhagy);
+		customers.put("Bhagy", bhagy);
 
-
-		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
-		Customer christina = new Customer(christinaID);
+		Customer christina = new Customer("christinaPass");
 		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put(christina.getCustomerID().getKey(), christina);
+		customers.put("Christina", christina);
 
-		CustomerID johnID = new CustomerID("John", "johnPass");
-		Customer john = new Customer(johnID);
+		Customer john = new Customer("johnPass");
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
-		customers.put(john.getCustomerID().getKey(), john);
+		customers.put("John", john);
 	}
 
 	public static NewBank getBank() {
@@ -46,8 +42,8 @@ public class NewBank {
 		boolean isValidUserName = (customers.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
 		Customer targetCustomer = customers.get(userName);
-		CustomerID targetCustomerId = targetCustomer.getCustomerID();
-		boolean isValidPassword = (targetCustomerId.checkPassword(password));
+		CustomerID targetCustomerId = new CustomerID(userName);
+		boolean isValidPassword = (targetCustomer.checkPassword(password));
 		if(!isValidPassword) throw new InvalidPasswordException();
 		return targetCustomerId;
 	}
@@ -158,33 +154,28 @@ public class NewBank {
 
 	}
 
-
 	/*
 	// Only use for testing
 	public void resetTestData() {
 		customers = new HashMap<>();
-		CustomerID bhagyID = new CustomerID("Bhagy", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
-		Customer bhagy = new Customer(bhagyID);
+		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put(bhagy.getCustomerID().getKey(), bhagy);
+		customers.put("Bhagy", bhagy);
 
-
-		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
-		Customer christina = new Customer(christinaID);
+		Customer christina = new Customer("christinaPass");
 		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put(christina.getCustomerID().getKey(), christina);
+		customers.put("Christina", christina);
 
-		CustomerID johnID = new CustomerID("John", "johnPass");
-		Customer john = new Customer(johnID);
+		Customer john = new Customer("johnPass");
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
-		customers.put(john.getCustomerID().getKey(), john);
+		customers.put("John", john);
 
 		customersID = new ArrayList<>();
-		customersID.add(bhagyID);
-		customersID.add(christinaID);
-		customersID.add(johnID);
+		customersID.add(new CustomerID("Bhagy"));
+		customersID.add(new CustomerID("Christina"));
+		customersID.add(new CustomerID("John"));
 	}
 
 	// Only use for testing
@@ -192,6 +183,7 @@ public class NewBank {
 		return customers;
 	}
 	*/
+
 
 
 }

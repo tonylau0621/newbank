@@ -66,7 +66,7 @@ public class NewBankTest {
         return;
       }
     }
-    fail(customerID.getFirstName() + "'s " + accountType + " account not found/not probably set.");
+    fail(customer.getFirstName() + "'s " + accountType + " account not found/not probably set.");
   }
 
   @ParameterizedTest
