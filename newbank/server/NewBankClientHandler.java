@@ -71,7 +71,7 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
-	public String runMove(CustomerID customer){
+	private String runMove(CustomerID customer){
 		try{
 			out.println("From:");
 			String from = in.readLine();
