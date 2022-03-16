@@ -3,13 +3,32 @@ package newbank.server;
 import java.util.ArrayList;
 
 public class Customer {
-	
+
+	private CustomerID customerID;
 	private ArrayList<Account> accounts;
-	
-	public Customer() {
-		accounts = new ArrayList<>();
+
+	public Customer(CustomerID customerID, ArrayList<Account> accounts) {
+		this.customerID = customerID;
+		this.accounts = accounts;
 	}
-	
+
+	public Customer(CustomerID customerID) {
+		this(customerID, new ArrayList<>());
+	}
+
+	public CustomerID getCustomerID() {
+		return customerID;
+	}
+
+	public ArrayList<Account> getAccounts() {
+		// Deep copy
+		ArrayList<Account> accountsCopy = new ArrayList<>();
+		for (int i = 0; i < accounts.size(); i++) {
+			accountsCopy.add(new Account(accounts.get(i).getAccount(), accounts.get(i).getAmount()));
+		}
+		return accountsCopy;
+	}
+
 	public String accountsToString() {
 		String s = "";
 		for(Account a : accounts) {
@@ -19,7 +38,7 @@ public class Customer {
 	}
 
 	public void addAccount(Account account) {
-		accounts.add(account);		
+		accounts.add(account);
 	}
 
 	public Account getAccount(String name){
