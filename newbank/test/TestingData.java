@@ -132,7 +132,8 @@ public class TestingData {
   // Data for PAY
   // Assume customer has enough balance.
   public static Stream<Arguments> provideCustomerIDAndValidPayCommand() {
-    String[] commands = {"PAY John 100", "PAY Christina 36.7", "PAY Bhagy 0.08"};
+    //String[] commands = {"PAY John 100", "PAY Christina 36.7", "PAY Bhagy 0.08"};
+    String[] commands = {"PAY 100 Main John Checking", "PAY 36.7 Main Bhagy Main", "PAY 0.08 Main Christina Savings"};
     Stream<Arguments> stream = Stream.of();
     for (int i = 0; i < customersID.size(); i++) {
       for (int j = 0; j < commands.length; j++) {
@@ -143,7 +144,7 @@ public class TestingData {
   }
 
   public static Stream<Arguments> provideCustomerIDAndInvalidPayCommand() {
-    String[] commands = {"PAY John 9999999", "PAY Christina -150", "PAY Bhagy 0", "PAY Peter 11.6", "PAY Christina -53.9"};
+    String[] commands = {"PAY John 9999999 Main Checking", "PAY 9999999 Main Bhagy Main", "PAY Christina -150", "PAY Bhagy 0", "PAY Peter 11.6", "PAY Christina -53.9", "PAY -100 Main John Checking"};
     Stream<Arguments> stream = Stream.of();
     for (int i = 0; i < customersID.size(); i++) {
       for (int j = 0; j < commands.length; j++) {

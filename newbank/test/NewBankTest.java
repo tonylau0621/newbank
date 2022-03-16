@@ -170,25 +170,29 @@ public class NewBankTest {
   public void validPayCommand(CustomerID customerID, String command) {
     String[] commands = command.split("\\s+");
     Customer payer = customers.get(customerID.getKey());
-    ArrayList<Account> payerAccounts = payer.getAccounts();
-    Customer receiver = customers.get(commands[1]);
-    ArrayList<Account> receiverAccounts = receiver.getAccounts();
-    Double amount = Double.parseDouble(commands[2]);
+    Account payerAccount = payer.getAccount(commands[2]);
+    Customer receiver = customers.get(commands[3]);
+    Account receiverAccount = receiver.getAccount(commands[4]);
+    Double amount = Double.parseDouble(commands[1]);
 
-    Double payerOriginalTotal = calculateTotalAmount(payerAccounts);
-    Double receiverOriginalTotal = calculateTotalAmount(receiverAccounts);
+    Double payerAccountOriginalAmount = payerAccount.getAmount();
+    Double receiverAccountOriginalAmount = receiverAccount.getAmount();
 
     Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
 
-    payerAccounts = payer.getAccounts();
-    receiverAccounts = receiver.getAccounts();
-    Double payerNewTotal = calculateTotalAmount(payerAccounts);
-    Double receiverNewTotal = calculateTotalAmount(receiverAccounts);
+    Double payerAccountNewAmount = payerAccount.getAmount();
+    Double receiverAccountNewAmount = receiverAccount.getAmount();
 
-    Assertions.assertEquals(payerOriginalTotal - amount, payerNewTotal);
-    Assertions.assertEquals(receiverOriginalTotal + amount, receiverNewTotal);
+    if (payerAccount != receiverAccount) {
+      Assertions.assertEquals(payerAccountOriginalAmount - amount, payerAccountNewAmount);
+      Assertions.assertEquals(receiverAccountOriginalAmount + amount, receiverAccountNewAmount);
+    } else {
+      Assertions.assertEquals(payerAccountOriginalAmount, payerAccountNewAmount);
+      Assertions.assertEquals(receiverAccountOriginalAmount, receiverAccountNewAmount);
+    }
   }
 
+  /*
   public Double calculateTotalAmount(ArrayList<Account> accounts) {
     Double totalAmount = 0.0;
     for (int i = 0; i < accounts.size(); i++) {
@@ -196,43 +200,37 @@ public class NewBankTest {
     }
     return totalAmount;
   }
+  */
 
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidPayCommand")
   public void invalidPayCommand(CustomerID customerID, String command) {
     String[] commands = command.split("\\s+");
-    Customer payer = customers.get(customerID.getKey());
-    ArrayList<Account> payerAccounts = payer.getAccounts();
-    if (commands.length < 3) {
-      fail("The command format is not correct");
-    }
-    Customer receiver = customers.get(commands[1]);
+    if (commands.length >= 5) {
+      try {
+        Customer payer = customers.get(customerID.getKey());
+        Account payerAccount = payer.getAccount(commands[2]);
+        Customer receiver = customers.get(commands[3]);
+        if (receiver == null) return;
+        Account receiverAccount = receiver.getAccount(commands[4]);
 
-    ArrayList<Account> receiverAccounts = receiver == null ? null : receiver.getAccounts();
-    try {
-      Double amount = Double.parseDouble(commands[2]);
-    } catch (NumberFormatException e) {
-      fail("Input amount is not a number");
-    }
+        if (payerAccount != null && receiverAccount != null) {
+          Double payerAccountOriginalAmount = payerAccount.getAmount();
+          Double receiverAccountOriginalAmount = receiverAccount.getAmount();
 
-    Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+          Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
 
+          Double payerAccountNewAmount = payerAccount.getAmount();
+          Double receiverAccountNewAmount = receiverAccount.getAmount();
 
-    ArrayList<Account> payerAccountsAfterCommand = payer.getAccounts();
-    Assertions.assertEquals(payerAccounts.size(), payerAccountsAfterCommand.size());
-    for (int i = 0; i < payerAccounts.size(); i++) {
-      Assertions.assertEquals(payerAccounts.get(i).getAccount(), payerAccountsAfterCommand.get(i).getAccount());
-      Assertions.assertEquals(payerAccounts.get(i).getAmount(), payerAccountsAfterCommand.get(i).getAmount());
-    }
-
-    if (receiver != null) {
-      ArrayList<Account> receiverAccountsAfterCommand = receiver.getAccounts();
-      Assertions.assertEquals(receiverAccounts.size(), receiverAccountsAfterCommand.size());
-      for (int i = 0; i < receiverAccounts.size(); i++) {
-        Assertions.assertEquals(receiverAccounts.get(i).getAccount(), receiverAccountsAfterCommand.get(i).getAccount());
-        Assertions.assertEquals(receiverAccounts.get(i).getAmount(), receiverAccountsAfterCommand.get(i).getAmount());
+          Assertions.assertEquals(payerAccountOriginalAmount, payerAccountNewAmount);
+          Assertions.assertEquals(receiverAccountOriginalAmount, receiverAccountNewAmount);
+        }
+      } catch (NumberFormatException e) {
+        return;
       }
     }
+
   }
   // End of tests for PAY
 

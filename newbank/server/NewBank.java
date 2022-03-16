@@ -27,11 +27,13 @@ public class NewBank {
 
 		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
 		Customer christina = new Customer(christinaID);
+		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put(christina.getCustomerID().getKey(), christina);
 
 		CustomerID johnID = new CustomerID("John", "johnPass");
 		Customer john = new Customer(johnID);
+		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put(john.getCustomerID().getKey(), john);
 	}
@@ -49,6 +51,7 @@ public class NewBank {
 		if(!isValidPassword) throw new InvalidPasswordException();
 		return targetCustomerId;
 	}
+
 
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
@@ -73,8 +76,8 @@ public class NewBank {
 					if (requestTokens.length > 4) {
 						try {
 							return payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2],
-									(requestTokens[3]),requestTokens[4]);}
-						catch (Exception e) {
+									requestTokens[3],requestTokens[4]);}
+						catch (NumberFormatException e) {
 							return "FAIL";
 						}
 					}
@@ -103,6 +106,11 @@ public class NewBank {
 			//return "Account does not exist";
 			return "FAIL";
 		}
+
+		//Negative amount
+		if (amount < 0.01){
+			return "FAIL";
+		}
 		//Not enough balance
 		if (target.getAccount(from).getAmount() < amount){
 			//return "Not enough amount in your account";
@@ -118,7 +126,7 @@ public class NewBank {
 	//Do I want to use Accounts or Customers?
 	// payAmount: Takes two accounts and an amount as input
 	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-							 String receivingCustomerKey, String receivingAccount ) {
+							 String receivingCustomerKey, String receivingAccount) {
 		//Account does not exist
 		Customer payer = customers.get(payingCustomer.getKey());
 		Customer receiver = customers.get(receivingCustomerKey);
@@ -128,12 +136,12 @@ public class NewBank {
 			return "FAIL";
 		}
 		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIl";}
+		if(amount < 0.01) {return "FAIL";}
 
 		//get Account Balance Amount
 		double balance = payer.getAccount(payingAccount).getAmount();
 		//Is there enough balance?
-		if(balance > amount) {
+		if(balance >= amount) {
 			//Adjust balance for both accounts
 			payer.getAccount(payingAccount).updateBalance(-amount);
 			receiver.getAccount(receivingAccount).updateBalance(amount);
@@ -150,6 +158,7 @@ public class NewBank {
 
 	}
 
+
 	/*
 	// Only use for testing
 	public void resetTestData() {
@@ -162,11 +171,13 @@ public class NewBank {
 
 		CustomerID christinaID = new CustomerID("Christina", "christinaPass");
 		Customer christina = new Customer(christinaID);
+		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put(christina.getCustomerID().getKey(), christina);
 
 		CustomerID johnID = new CustomerID("John", "johnPass");
 		Customer john = new Customer(johnID);
+		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put(john.getCustomerID().getKey(), john);
 
@@ -181,6 +192,7 @@ public class NewBank {
 		return customers;
 	}
 	*/
+
 
 }
 
