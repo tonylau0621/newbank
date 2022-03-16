@@ -79,7 +79,7 @@ public class NewBankClientHandler extends Thread {
 			String to = in.readLine();
 			out.println("Amount:");
 			String amount = in.readLine();
-			if (!from.contains(" ") && !to.contains(" ")) {
+			if (!from.contains(" ") && !to.contains(" ") && !amount.contains(" ")) {
 				return "MOVE " + amount + " " + from + " " + to;
 			}
 		} catch (IOException e) {
