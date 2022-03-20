@@ -156,7 +156,7 @@ public class NewBank {
 	}
 
 	private void addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
-		if (customers.keySet().contains(username)) {
+		if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
 			throw new InvalidUserNameException();
 		}
 		String userID = generateUserId();
