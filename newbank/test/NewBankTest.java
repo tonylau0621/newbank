@@ -234,6 +234,25 @@ public class NewBankTest {
   }
   // End of tests for PAY
 
+  /*
+  // Test for generateUserId method
+  // Change the modifier of the method to public before test.
+  @Test
+  public void generateManyUniqueUserID() {
+    String[] userIDs = new String[9999];
+    for (int i = 0; i < userIDs.length; i++) {
+      userIDs[i] = bank.generateUserId();
+      customers.put("eqrqdagdas"+i, new Customer(userIDs[i], "", "", "", "", "", ""));
+      //System.out.println(userIDs[i]);
+      for (int j = 0; j < i; j++) {
+        if (userIDs[i].equals(userIDs[j])) {
+          fail("There exists a duplicated user id. " + i);
+        }
+      }
+    }
+  }
+  */
+
 
   @AfterEach
   public void setupAfterEachTime() {
