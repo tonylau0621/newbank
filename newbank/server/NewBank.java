@@ -3,6 +3,8 @@ package newbank.server;
 // Only user for testing
 //import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
 
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
@@ -19,16 +21,16 @@ public class NewBank {
 	}
 
 	private void addTestData() {
-		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
 
-		Customer christina = new Customer("christinaPass");
+		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
 		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
 
-		Customer john = new Customer("johnPass");
+		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
@@ -151,6 +153,38 @@ public class NewBank {
 			//return "Insufficient balance.";
 			return "FAIL";
 		}
+
+	}
+
+	private void addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) {
+		String userID = generateUserId();
+		Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
+		customer.addAccount(new Account("Main", 0.0));
+		customers.put(username, customer);
+		addCustomerToDatabase(userID, customer);
+	}
+
+	// If all 99999999 userIDs are occupied, this method will perform infinite loop.
+	private String generateUserId() {
+		Random ran = new Random();
+		while (true) {
+			String userID = String.valueOf(ran.nextInt(99999999) + 1);
+			for (int i = userID.length(); i < 8; i++) {
+				userID = "0" + userID;
+			}
+
+			Customer[] customerArr = customers.values().toArray(new Customer[0]);
+			for (int i = 0; i < customerArr.length; i++) {
+				if (customerArr[0].getUserID().equals(userID)) {
+					continue;
+				}
+			}
+			return userID;
+		}
+	}
+
+	// Empty method for later database development
+	private void addCustomerToDatabase(String userID, Customer customer) {
 
 	}
 

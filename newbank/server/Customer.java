@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Customer {
 
+	private String userID;
 	private String password;
 	private String firstName;
 	private String lastName;
@@ -12,7 +13,8 @@ public class Customer {
 	private String address;
 	private ArrayList<Account> accounts;
 
-	public Customer(String password, String firstName, String lastName, String phone, String email, String address) {
+	public Customer(String userID, String password, String firstName, String lastName, String phone, String email, String address) {
+		this.userID = userID;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -20,14 +22,6 @@ public class Customer {
 		this.email = email;
 		this.address = address;
 		accounts = new ArrayList<>();
-	}
-
-	public Customer(String password) {
-		this(password, "", "", "", "", "");
-	}
-
-	public Customer() {
-		this("", "", "", "", "", "");
 	}
 
 	public ArrayList<Account> getAccounts() {
@@ -113,6 +107,10 @@ public class Customer {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getUserID() {
+		return userID;
 	}
 
 }
