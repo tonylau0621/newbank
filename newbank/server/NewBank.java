@@ -4,7 +4,6 @@ package newbank.server;
 //import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.UUID;
 
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
