@@ -60,6 +60,7 @@ public class NewBank {
 					if (requestTokens.length > 1) {
 						return newAccount(customer, requestTokens[1]);
 					}
+					break;
 				case "MOVE" :
 					if (requestTokens.length > 3) {
 						try {
@@ -68,6 +69,7 @@ public class NewBank {
 							return "FAIL";
 						}
 					}
+					break;
 				case "PAY" :
 					if (requestTokens.length > 4) {
 						try {
@@ -77,6 +79,7 @@ public class NewBank {
 							return "FAIL";
 						}
 					}
+					break;
 				default : return "FAIL";
 			}
 		}
@@ -151,7 +154,10 @@ public class NewBank {
 			//return "Insufficient balance.";
 			return "FAIL";
 		}
+	}
 
+	public Customer getCustomer(CustomerID id){
+		return this.customers.get(id);
 	}
 
 	/*
