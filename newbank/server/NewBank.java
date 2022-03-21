@@ -118,7 +118,7 @@ public class NewBank {
 	//Do I want to use Accounts or Customers?
 	// payAmount: Takes two accounts and an amount as input
 	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-							 String receivingCustomerKey, String receivingAccount ) {
+							 String receivingCustomerKey, String receivingAccount) {
 		//Account does not exist
 		Customer payer = customers.get(payingCustomer.getKey());
 		Customer receiver = customers.get(receivingCustomerKey);
@@ -128,12 +128,12 @@ public class NewBank {
 			return "FAIL";
 		}
 		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIl";}
+		if(amount < 0.01) {return "FAIL";}
 
 		//get Account Balance Amount
 		double balance = payer.getAccount(payingAccount).getAmount();
 		//Is there enough balance?
-		if(balance > amount) {
+		if(balance >= amount) {
 			//Adjust balance for both accounts
 			payer.getAccount(payingAccount).updateBalance(-amount);
 			receiver.getAccount(receivingAccount).updateBalance(amount);
