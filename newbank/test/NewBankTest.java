@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,7 +58,13 @@ public class NewBankTest {
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndValidNewAccountCommand")
   public void validNewAccountCommand(CustomerID customerID, String command) {
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
     Customer customer = customers.get(customerID.getKey());
     ArrayList<Account> accounts = customer.getAccounts();
     String accountType = command.split("\\s+")[1];
@@ -83,8 +90,13 @@ public class NewBankTest {
       accountsBeforeCommand.add(new Account(customer.getAccounts().get(i).getAccount(), customer.getAccounts().get(i).getAmount()));
     }
     */
-
-    Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
     ArrayList<Account> accountsAfterCommand = customer.getAccounts();
     Assertions.assertEquals(accountsBeforeCommand.size(), accountsAfterCommand.size());
     for (int i = 0; i < accountsBeforeCommand.size(); i++) {
@@ -118,8 +130,13 @@ public class NewBankTest {
 
     Double account1OldBalance = account1.getAmount();
     Double account2OldBalance = account2.getAmount();
-
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
 
     Assertions.assertEquals(account1OldBalance - amount, account1.getAmount());
     Assertions.assertEquals(account2OldBalance + amount, account2.getAmount());
@@ -154,8 +171,13 @@ public class NewBankTest {
 
     Double account1OldBalance = account1.getAmount();
     Double account2OldBalance = account2.getAmount();
-
-    Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
 
     Assertions.assertEquals(account1OldBalance, account1.getAmount());
     Assertions.assertEquals(account2OldBalance, account2.getAmount());
@@ -177,8 +199,13 @@ public class NewBankTest {
 
     Double payerAccountOriginalAmount = payerAccount.getAmount();
     Double receiverAccountOriginalAmount = receiverAccount.getAmount();
-
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
 
     Double payerAccountNewAmount = payerAccount.getAmount();
     Double receiverAccountNewAmount = receiverAccount.getAmount();
@@ -217,8 +244,13 @@ public class NewBankTest {
         if (payerAccount != null && receiverAccount != null) {
           Double payerAccountOriginalAmount = payerAccount.getAmount();
           Double receiverAccountOriginalAmount = receiverAccount.getAmount();
-
-          Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+          Response processRequestResult = new Response();
+          try {
+            processRequestResult = bank.processRequest(customerID, command);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
 
           Double payerAccountNewAmount = payerAccount.getAmount();
           Double receiverAccountNewAmount = receiverAccount.getAmount();

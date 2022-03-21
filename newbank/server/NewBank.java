@@ -2,6 +2,7 @@ package newbank.server;
 
 // Only user for testing
 //import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 
 // Please comment out all "Only use for testing" method/block/statement for real use.
@@ -21,6 +22,11 @@ public class NewBank {
 	private void addTestData() {
 		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
+		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
+		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
+		bhagy.addAccount(new Account("Savings", 1000.0));
+		bhagy.addAccount(new Account("Investment", 1000.0));
+		bhagy.addAccount(new Account("Current", 1000.0));
 		customers.put("Bhagy", bhagy);
 
 		Customer christina = new Customer("christinaPass");
@@ -50,37 +56,66 @@ public class NewBank {
 
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized String processRequest(CustomerID customer, String request) {
+	public synchronized Response processRequest(CustomerID customer, String request) throws IOException {
 		String[] requestTokens = request.split("\\s+");
+		String requestFunction = requestTokens[0];
+		Response response = new Response();
+		response.setCustomer(customer);
+		switch(requestFunction) {
+			case "LOGIN" : {
+				customer = UserService.login();
+				response.setCustomer(customer);
+				response.setResponseMessage("Login Successful. What do you want to do?");
+				return response;
+			} default: {
+				if(customer == null) {
+					customer = UserService.login();
+					response.setCustomer(customer);
+				}
+				switch(requestFunction) {
+					case "SHOWMYACCOUNTS" : {
+						response.setResponseMessage(showMyAccounts(customer));
+						return response;
+					}
+					case "NEWACCOUNT" :
+						if (requestTokens.length > 1) {
+							response.setResponseMessage(newAccount(customer, requestTokens[1]));
+							return response;
+						}
+					case "MOVE" :
+						if (requestTokens.length > 3) {
+							try {
+								response.setResponseMessage(moveAmount(Double.parseDouble(requestTokens[1]), requestTokens[2], requestTokens[3], customer));
+								return response;
+							} catch (NumberFormatException e) {
+								response.setResponseMessage("FAIL");
+								return response;
+							}
+						}
+					case "PAY" :
+						if (requestTokens.length > 4) {
+							try {
+								response.setResponseMessage(payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2], requestTokens[3], requestTokens[4]));
+								return response;
+							}
+							catch (NumberFormatException e) {
+								response.setResponseMessage("FAIL");
+								return response;
+							}
+						}
+					case "LOGOUT" : {
+						response.setCustomer(null);
+						response.setResponseMessage("Logout Successful.");
+						return response;
+					}
 
-		if(customers.containsKey(customer.getKey())) {
-			switch(requestTokens[0]) {
-				case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-				case "NEWACCOUNT" :
-					if (requestTokens.length > 1) {
-						return newAccount(customer, requestTokens[1]);
+					default : {
+						response.setResponseMessage("FAIL");
+						return response;
 					}
-				case "MOVE" :
-					if (requestTokens.length > 3) {
-						try {
-							return moveAmount(Double.parseDouble(requestTokens[1]), requestTokens[2], requestTokens[3], customer);
-						} catch (NumberFormatException e) {
-							return "FAIL";
-						}
-					}
-				case "PAY" :
-					if (requestTokens.length > 4) {
-						try {
-							return payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2],
-									requestTokens[3],requestTokens[4]);}
-						catch (NumberFormatException e) {
-							return "FAIL";
-						}
-					}
-				default : return "FAIL";
+				}
 			}
 		}
-		return "FAIL";
 	}
 
 	private String showMyAccounts(CustomerID customer) {
