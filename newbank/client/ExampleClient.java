@@ -25,11 +25,18 @@ public class ExampleClient extends Thread{
 				try {
 					while(true) {
 						String response = bankServerIn.readLine();
+						if (response.equals("clearTerminal")){
+							clearTerminal();
+							continue;
+						}
 						System.out.println(response);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 					return;
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					Thread.currentThread().interrupt();
 				}
 			}
 		};
@@ -52,5 +59,21 @@ public class ExampleClient extends Thread{
 
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		new ExampleClient("localhost",14002).start();
+	}
+
+	//Clear the client terminal.
+	private void clearTerminal() throws IOException, InterruptedException{
+		final String operatingSystem = System.getProperty("os.name");
+
+		if (operatingSystem.contains("Windows")) {
+			ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "cls");
+			Process startProcess = pb.inheritIO().start();
+			startProcess.waitFor();
+		}
+		else {
+			ProcessBuilder pb = new ProcessBuilder("clear");
+			Process startProcess = pb.inheritIO().start();
+			startProcess.waitFor();
+		}
 	}
 }
