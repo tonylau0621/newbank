@@ -64,7 +64,7 @@ public class UserService {
     }
 
     //Add new customer
-    public static Response newCustomer() throws IOException{
+    public static Response newCustomer() throws IOException, InterruptedException{
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Password");
@@ -79,13 +79,14 @@ public class UserService {
         String email = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Address");
         String address = CommunicationService.readIn();
-        Response response = new Response();
         //Send to Newbank
         try {
             return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
         } catch (InvalidUserNameException e) {
-            response.setResponseMessage(e.getMessage());
-            return response;
+            CommunicationService.sendOut("Log In Failed");
+            Thread.sleep(500);
+            CommunicationService.errorAndWait(e);
+            return null;
         }
 
     }

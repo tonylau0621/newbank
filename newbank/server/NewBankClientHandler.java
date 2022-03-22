@@ -30,19 +30,7 @@ public class NewBankClientHandler extends Thread {
 				CommunicationService.cleanTerminal();
 				Response response = null;
 				if (customer == null){
-					out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
-					String input = in.readLine();
-					if (input.equals("1")){
-						customer = UserService.login();
-					}
-					else if (input.equals("2")){
-						response = sendRequest(customer, "L"+input);
-						customer = response.getCustomer();
-						message = response.getResponseMessage();
-						out.println(message);
-						out.println("Press enter to go back to main menu.");
-						input = in.readLine();
-					}
+					customer = welcomePage();
 				}else{
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
@@ -68,7 +56,7 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
-	public Response sendRequest(CustomerID customer, String request) throws IOException{
+	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException{
 		String toSend = "";
 		switch(request){
 			case "1":
@@ -93,5 +81,24 @@ public class NewBankClientHandler extends Thread {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	private CustomerID welcomePage() throws IOException, InterruptedException{
+		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
+		String input = in.readLine();
+		if (input.equals("1")){
+			return UserService.login();
+
+		}
+		else if (input.equals("2")){
+			Response response = sendRequest(null, "L"+input);
+			if (response != null){
+				String message = response.getResponseMessage();
+				out.println(message);
+				out.println("Press enter to go back to main menu.");
+				input = in.readLine();
+			}
+		}
+		return null;
 	}
 }
