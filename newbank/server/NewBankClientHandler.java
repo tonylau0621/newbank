@@ -24,18 +24,30 @@ public class NewBankClientHandler extends Thread {
 		// keep getting requests from the client and processing them
 		try {
 			CustomerID customer = null;
+			String message;
 			while(true) {
 				//If not logged in, ask customer to login
 				CommunicationService.cleanTerminal();
+				Response response = null;
 				if (customer == null){
-					out.println("Welcome to [bank name]To login, \nPlease start by entering your login details.");
-					customer = UserService.login();
+					out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
+					String input = in.readLine();
+					if (input.equals("1")){
+						customer = UserService.login();
+					}
+					else if (input.equals("2")){
+						response = sendRequest(customer, "L"+input);
+						customer = response.getCustomer();
+						message = response.getResponseMessage();
+						out.println(message);
+						out.println("Press enter to go back to main menu.");
+						input = in.readLine();
+					}
 				}else{
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
 					String request = in.readLine();
-					String message = null;
-					Response response = sendRequest(customer, request);
+					response = sendRequest(customer, request);
 					customer = response.getCustomer();
 					message = response.getResponseMessage();
 					out.println(message);
@@ -55,6 +67,7 @@ public class NewBankClientHandler extends Thread {
 			}
 		}
 	}
+
 	public Response sendRequest(CustomerID customer, String request) throws IOException{
 		String toSend = "";
 		switch(request){
@@ -69,6 +82,10 @@ public class NewBankClientHandler extends Thread {
 			case "4":
 				toSend = "LOGOUT";
 				break;
+			case "L2":
+				return UserService.newCustomer();
+			default:
+				toSend = "";
 		}
 		try {
 			return bank.processRequest(customer, toSend);

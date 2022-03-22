@@ -1,10 +1,12 @@
 package newbank.server;
 
 // Only user for testing
-import java.util.ArrayList;
+///mport java.util.ArrayList;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
@@ -13,7 +15,7 @@ public class NewBank {
 	private HashMap<String,Customer> customers;
 
 	// Only use for testing
-	public ArrayList<CustomerID> customersID;
+	//public ArrayList<CustomerID> customersID;
 
 	private NewBank() {
 		customers = new HashMap<>();
@@ -183,8 +185,44 @@ public class NewBank {
 		return customers.get(id.getKey());
 	}
 
+	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
+        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
+            throw new InvalidUserNameException();
+        }
+        String userID = generateUserID(customers);
+        Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
+        customer.addAccount(new Account("Main", 0.0));
+        customers.put(username, customer);
+		Response response = new Response();
+		response.setResponseMessage("Registration completed. Please Login with your username and password");
+		return response;
+        //addCustomerToDatabase(userID, customer);
+    }
+
+    
+    // If all 99999999 userIDs are occupied, this method will perform infinite loop.
+    // Can be changed to private for real use.
+    public static String generateUserID(HashMap<String,Customer> customers) {
+        Random ran = new Random();
+        generateAgain:
+        while (true) {
+            String userID = String.valueOf(ran.nextInt(99999999) + 1);
+            for (int i = userID.length(); i < 8; i++) {
+                userID = "0" + userID;
+            }
+
+            Customer[] customerArr = customers.values().toArray(new Customer[0]);
+            for (int i = 0; i < customerArr.length; i++) {
+                if (customerArr[i].getUserID().equals(userID)) {
+                    continue generateAgain;
+                }
+            }
+            return userID;
+        }
+    }
+
 	
-	// Only use for testing
+	/*// Only use for testing
 	public void resetTestData() {
 		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
@@ -214,7 +252,7 @@ public class NewBank {
 	// Only use for testing
 	public HashMap<String,Customer> getCustomers() {
 		return customers;
-	}
+	}*/
 	
 
 

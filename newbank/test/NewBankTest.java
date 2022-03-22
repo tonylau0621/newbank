@@ -284,7 +284,7 @@ public class NewBankTest {
   public void generateManyUniqueUserID() {
     String[] userIDs = new String[20000];
     for (int i = 0; i < userIDs.length; i++) {
-      userIDs[i] = UserService.generateUserID(customers);
+      userIDs[i] = bank.generateUserID(customers);
       customers.put("testingUser"+i, new Customer(userIDs[i], "", "", "", "", "", ""));
       //System.out.println(userIDs[i]);
       for (int j = 0; j < i; j++) {

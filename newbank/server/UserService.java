@@ -2,8 +2,7 @@ package newbank.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+
 
 public class UserService {
     public static CustomerID login() throws IOException, InterruptedException {
@@ -26,8 +25,8 @@ public class UserService {
         return customer;
     }
 
-    //show the accounts and return number of account
-    public static ArrayList<Account> showAccounts(CustomerID customerID){
+    //show the accounts for the user to choose.
+    private static ArrayList<Account> showAccounts(CustomerID customerID){
         ArrayList<Account> accounts = NewBank.getBank().getCustomer(customerID).getAccounts();
         for (int i=0; i< accounts.size(); i++){
             CommunicationService.sendOut(String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount());
@@ -53,7 +52,7 @@ public class UserService {
         try {
             try{
                 request = "MOVE" + " " + amount + " " + accounts.get(Integer.parseInt(from)-1).getAccount()  + " " + accounts.get(Integer.parseInt(to)-1).getAccount(); 
-            }catch (NumberFormatException ne){
+            }catch (NumberFormatException | IndexOutOfBoundsException ne){
                 throw new InvalidAccountException();
             }
             return NewBank.getBank().processRequest(customerID, request);
@@ -64,44 +63,30 @@ public class UserService {
         }
     }
 
-
-    public static void addCustomer(HashMap<String,Customer> customers, String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
-        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
-            throw new InvalidUserNameException();
+    //Add new customer
+    public static Response newCustomer() throws IOException{
+        CommunicationService.sendOut("Enter Username");
+        String userName = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Password");
+        String password = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Firstname");
+        String firstname = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Lastname");
+        String lastname = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Phone");
+        String phone = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Email");
+        String email = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Address");
+        String address = CommunicationService.readIn();
+        Response response = new Response();
+        //Send to Newbank
+        try {
+            return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
+        } catch (InvalidUserNameException e) {
+            response.setResponseMessage(e.getMessage());
+            return response;
         }
-        String userID = generateUserID(customers);
-        Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
-        customer.addAccount(new Account("Main", 0.0));
-        customers.put(username, customer);
-        addCustomerToDatabase(userID, customer);
-    }
-
-    // If all 99999999 userIDs are occupied, this method will perform infinite loop.
-    // Can be changed to private for real use.
-    public static String generateUserID(HashMap<String,Customer> customers) {
-        Random ran = new Random();
-        generateAgain:
-        while (true) {
-            String userID = String.valueOf(ran.nextInt(99999999) + 1);
-            for (int i = userID.length(); i < 8; i++) {
-                userID = "0" + userID;
-            }
-
-            Customer[] customerArr = customers.values().toArray(new Customer[0]);
-            for (int i = 0; i < customerArr.length; i++) {
-                if (customerArr[i].getUserID().equals(userID)) {
-                    continue generateAgain;
-                }
-            }
-            return userID;
-        }
-    }
-
-    // Empty method for later database development
-    private static void addCustomerToDatabase(String userID, Customer customer) {
 
     }
-
-
-
 }
