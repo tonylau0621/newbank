@@ -2,6 +2,8 @@ package newbank.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class UserService {
     public static CustomerID login() throws IOException, InterruptedException {
@@ -62,6 +64,43 @@ public class UserService {
         }
     }
 
+
+    public static void addCustomer(HashMap<String,Customer> customers, String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
+        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
+            throw new InvalidUserNameException();
+        }
+        String userID = generateUserID(customers);
+        Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
+        customer.addAccount(new Account("Main", 0.0));
+        customers.put(username, customer);
+        addCustomerToDatabase(userID, customer);
+    }
+
+    // If all 99999999 userIDs are occupied, this method will perform infinite loop.
+    // Can be changed to private for real use.
+    public static String generateUserID(HashMap<String,Customer> customers) {
+        Random ran = new Random();
+        generateAgain:
+        while (true) {
+            String userID = String.valueOf(ran.nextInt(99999999) + 1);
+            for (int i = userID.length(); i < 8; i++) {
+                userID = "0" + userID;
+            }
+
+            Customer[] customerArr = customers.values().toArray(new Customer[0]);
+            for (int i = 0; i < customerArr.length; i++) {
+                if (customerArr[i].getUserID().equals(userID)) {
+                    continue generateAgain;
+                }
+            }
+            return userID;
+        }
+    }
+
+    // Empty method for later database development
+    private static void addCustomerToDatabase(String userID, Customer customer) {
+
+    }
 
 
 

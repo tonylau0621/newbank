@@ -21,7 +21,7 @@ public class NewBank {
 	}
 
 	private void addTestData() {
-		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
 		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
 		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
@@ -30,12 +30,12 @@ public class NewBank {
 		bhagy.addAccount(new Account("Current", 1000.0));
 		customers.put("Bhagy", bhagy);
 
-		Customer christina = new Customer("christinaPass");
+		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
 		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
 
-		Customer john = new Customer("johnPass");
+		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
@@ -186,17 +186,21 @@ public class NewBank {
 	
 	// Only use for testing
 	public void resetTestData() {
-		customers = new HashMap<>();
-		Customer bhagy = new Customer("bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
 		bhagy.addAccount(new Account("Main", 1000.0));
+		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
+		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
+		bhagy.addAccount(new Account("Savings", 1000.0));
+		bhagy.addAccount(new Account("Investment", 1000.0));
+		bhagy.addAccount(new Account("Current", 1000.0));
 		customers.put("Bhagy", bhagy);
 
-		Customer christina = new Customer("christinaPass");
+		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
 		christina.addAccount(new Account("Main", 1500.0));
 		christina.addAccount(new Account("Savings", 1500.0));
 		customers.put("Christina", christina);
 
-		Customer john = new Customer("johnPass");
+		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
