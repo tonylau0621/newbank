@@ -25,4 +25,20 @@ public class CommunicationService {
 
     public static PrintWriter getPrintWriter() { return out; }
     public static BufferedReader getBufferedReader() { return in; }
+
+    public static void cleanTerminal(){
+        out.println("clearTerminal");
+    }
+
+    public static void errorAndWait(Exception e) throws InterruptedException{
+		out.println(e.getMessage());
+		out.println("You will be redirected to main page in 3 seconds");
+		//Wait 3 second.
+		for (int i = 0; i < 3; i++){
+			out.println(".");
+			Thread.sleep(1000);
+		}
+		out.println("");
+		cleanTerminal();
+	}
 }
