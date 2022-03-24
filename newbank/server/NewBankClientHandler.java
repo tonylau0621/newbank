@@ -31,7 +31,14 @@ public class NewBankClientHandler extends Thread {
 				Response response = null;
 				if (customer == null){
 					customer = welcomePage();
-				}else{
+				} else if (customer != null && customer.isAdmin()) {
+					// print admin menu to output stream
+					// read a request from the client
+					// process the request
+					out.println("Admin Menu");
+					String request = in.readLine();
+					out.println("Processing admin request...");
+				} else {
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
 					String request = in.readLine();
@@ -88,7 +95,6 @@ public class NewBankClientHandler extends Thread {
 		String input = in.readLine();
 		if (input.equals("1")){
 			return UserService.login();
-
 		}
 		else if (input.equals("2")){
 			Response response = sendRequest(null, "L"+input);
@@ -98,6 +104,9 @@ public class NewBankClientHandler extends Thread {
 				out.println("Press enter to go back to main menu.");
 				input = in.readLine();
 			}
+		}
+		else if (input.equals("adminLogin")){
+			return AdminService.login();
 		}
 		return null;
 	}
