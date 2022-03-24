@@ -32,12 +32,16 @@ public class NewBankClientHandler extends Thread {
 				if (customer == null){
 					customer = welcomePage();
 				} else if (customer != null && customer.isAdmin()) {
-					// print admin menu to output stream
-					// read a request from the client
-					// process the request
+					// go to admin menu
 					out.println("Admin Menu");
 					String request = in.readLine();
 					out.println("Processing admin request...");
+					response = sendAdminRequest(customer, request);
+					customer = response.getCustomer();
+					message = response.getResponseMessage();
+					out.println(message);
+					out.println("Press enter to continue");
+					request = in.readLine();
 				} else {
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
@@ -79,6 +83,23 @@ public class NewBankClientHandler extends Thread {
 				break;
 			case "L2":
 				return UserService.newCustomer();
+			default:
+				toSend = "";
+		}
+		try {
+			return bank.processRequest(customer, toSend);
+		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+		String toSend = "";
+		switch(request){
+			case "quit":
+				toSend = "LOGOUT";
+				break;
 			default:
 				toSend = "";
 		}
