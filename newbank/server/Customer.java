@@ -12,6 +12,7 @@ public class Customer {
 	private String email;
 	private String address;
 	private ArrayList<Account> accounts;
+	private ArrayList<Transaction> transactions;
 
 	public Customer(String userID, String password, String firstName, String lastName, String phone, String email, String address) {
 		this.userID = userID;
@@ -28,7 +29,7 @@ public class Customer {
 		// Deep copy
 		ArrayList<Account> accountsCopy = new ArrayList<>();
 		for (int i = 0; i < accounts.size(); i++) {
-			accountsCopy.add(new Account(accounts.get(i).getAccount(), accounts.get(i).getAmount()));
+			accountsCopy.add(new Account(accounts.get(i).getID(), accounts.get(i).getAccount(), accounts.get(i).getAmount()));
 		}
 		return accountsCopy;
 	}
@@ -111,6 +112,10 @@ public class Customer {
 
 	public String getUserID() {
 		return userID;
+	}
+
+	public String getPassword(){
+		return password;
 	}
 
 }
