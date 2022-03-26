@@ -1,7 +1,11 @@
 package newbank.server;
 
 // Only user for testing
-///mport java.util.ArrayList;
+//import java.util.ArrayList;
+
+import newbank.server.loan.AvailableLoan;
+import newbank.server.loan.Loan;
+import newbank.server.loan.LoanMarketplace;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +16,7 @@ import java.util.Random;
 public class NewBank {
 
 	private static final NewBank bank = new NewBank();
+	private static LoanMarketplace loanMarketplace;
 	private HashMap<String,Customer> customers;
 
 	// Only use for testing
@@ -19,6 +24,7 @@ public class NewBank {
 
 	private NewBank() {
 		customers = new HashMap<>();
+		loanMarketplace = new LoanMarketplace();
 		addTestData();
 	}
 
@@ -41,10 +47,34 @@ public class NewBank {
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
+
+		// Loan
+
+		AvailableLoan aL1 = new AvailableLoan("00243584", 800.0);
+		bhagy.addAvailableLoan(aL1);
+
+		AvailableLoan aL2 = new AvailableLoan("18392702", 300.0);
+		AvailableLoan aL3 = new AvailableLoan("18392702", 200.0);
+		christina.addAvailableLoan(aL2);
+		christina.addAvailableLoan(aL3);
+
+		loanMarketplace.putAvailableLoan(aL1);
+		loanMarketplace.putAvailableLoan(aL2);
+		loanMarketplace.putAvailableLoan(aL3);
+
+		Loan loan1 = new Loan("00243584", "60023945", 700.0);
+		bhagy.addLentLoan(loan1);
+		john.addBorrowedLoan(loan1);
+
+		loanMarketplace.putLoan(loan1);
 	}
 
 	public static NewBank getBank() {
 		return bank;
+	}
+
+	public static LoanMarketplace getLoanMarketplace() {
+		return loanMarketplace;
 	}
 
 	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
@@ -105,6 +135,8 @@ public class NewBank {
         for (int i=0; i< accounts.size(); i++){
             result += String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
         }
+		// To show mirco-loan details
+		result += this.getCustomer(customer).showLoanDetails();
 		return result;
 	}
 
@@ -185,6 +217,16 @@ public class NewBank {
 		return customers.get(id.getKey());
 	}
 
+	public Customer getCustomer(String userID) {
+		Customer[] customerArr = customers.values().toArray(new Customer[0]);
+		for (int i = 0; i < customerArr.length; i++) {
+			if (customerArr[i].getUserID().equals(userID)) {
+				return customerArr[i];
+			}
+		}
+		return null;
+	}
+
 	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
         if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
             throw new InvalidUserNameException();
@@ -224,24 +266,7 @@ public class NewBank {
 	
 	/*// Only use for testing
 	public void resetTestData() {
-		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
-		bhagy.addAccount(new Account("Main", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
-		bhagy.addAccount(new Account("Savings", 1000.0));
-		bhagy.addAccount(new Account("Investment", 1000.0));
-		bhagy.addAccount(new Account("Current", 1000.0));
-		customers.put("Bhagy", bhagy);
-
-		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
-		christina.addAccount(new Account("Main", 1500.0));
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-
-		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
-		john.addAccount(new Account("Main", 1200.0));
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
+		addTestData();
 
 		customersID = new ArrayList<>();
 		customersID.add(new CustomerID("Bhagy"));
