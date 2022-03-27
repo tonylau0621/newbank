@@ -31,7 +31,18 @@ public class NewBankClientHandler extends Thread {
 				Response response = null;
 				if (customer == null){
 					customer = welcomePage();
-				}else{
+				} else if (customer != null && customer.isAdmin()) {
+					// go to admin menu
+					out.println("Admin Menu");
+					String request = in.readLine();
+					out.println("Processing admin request...");
+					response = sendAdminRequest(customer, request);
+					customer = response.getCustomer();
+					message = response.getResponseMessage();
+					out.println(message);
+					out.println("Press enter to continue");
+					request = in.readLine();
+				} else {
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
 					String request = in.readLine();
@@ -83,12 +94,28 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+		String toSend = "";
+		switch(request){
+			case "quit":
+				toSend = "LOGOUT";
+				break;
+			default:
+				toSend = "";
+		}
+		try {
+			return bank.processRequest(customer, toSend);
+		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private CustomerID welcomePage() throws IOException, InterruptedException{
 		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
 		String input = in.readLine();
 		if (input.equals("1")){
 			return UserService.login();
-
 		}
 		else if (input.equals("2")){
 			Response response = sendRequest(null, "L"+input);
@@ -98,6 +125,9 @@ public class NewBankClientHandler extends Thread {
 				out.println("Press enter to go back to main menu.");
 				input = in.readLine();
 			}
+		}
+		else if (input.equals("adminLogin")){
+			return AdminService.login();
 		}
 		return null;
 	}
