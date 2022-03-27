@@ -33,7 +33,7 @@ public class NewBankClientHandler extends Thread {
 					customer = welcomePage();
 				}else{
 					//Show other service if logged in
-					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) View Transaction History\n 5) Logout");
+					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Create New Account\n 5) View Transaction History\n 6) Logout");
 					String request = in.readLine();
 					response = sendRequest(customer, request);
 					customer = response.getCustomer();
@@ -68,9 +68,11 @@ public class NewBankClientHandler extends Thread {
 				toSend = "PAY";
 				break;
 			case "4":
+				return UserService.newAccount(customer);
+			case "5":
 				toSend = "TRANSACTIONRECORD";
 				break;
-			case "5":
+			case "6":
 				toSend = "LOGOUT";
 				break;
 			case "L2":

@@ -1,4 +1,5 @@
 id, username, password, firstName, lastName, phone, email, address
+30970859,beckywong,beckywongPW,Becky,Wong,,,
 60023945,John,johnPass, , , , , 
 47971955,Josh,joshPass,Josh,Man,000,0.0,000#se2#0000#se2#0000
 18392702,Christina,christinaPass, , , , , 

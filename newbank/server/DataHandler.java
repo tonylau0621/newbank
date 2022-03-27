@@ -64,10 +64,6 @@ public class DataHandler {
         return customers;
     }
 
-    public static void updateCustomer(Map<String, Customer> customers) throws IOException{
-        updateCustomerCSV(customers);
-        updateAccountCSV(customers);
-    }
 
     private static void getComma(String[] line){
         //replace the seperater by the comma
@@ -99,7 +95,7 @@ public class DataHandler {
         }
     }
 
-    private static void updateCustomerCSV(Map<String, Customer> customers) throws IOException {
+    public static void updateCustomerCSV(Map<String, Customer> customers) throws IOException {
         // write back staff data
         File file = new File(cusCsv);
         // creates the file
@@ -125,7 +121,7 @@ public class DataHandler {
       }
     }
 
-    private static void updateAccountCSV(Map<String, Customer> customers) throws IOException {
+    public static void updateAccountCSV(Map<String, Customer> customers) throws IOException {
         // write back staff data
         File file = new File(accCsv);
         // creates the file
@@ -148,7 +144,7 @@ public class DataHandler {
       }
     }
 
-    public static void updateTransaction(ArrayList<Transaction> transactions) throws IOException {
+    public static void updateTransactionCSV(ArrayList<Transaction> transactions) throws IOException {
         // write back staff data
         File file = new File(tranCsv);
         // creates the file

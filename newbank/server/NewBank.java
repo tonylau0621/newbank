@@ -94,12 +94,19 @@ public class NewBank {
 		return result;
 	}
 
-	private String newAccount(CustomerID customer, String accountName) {
-		if(customers.keySet().contains(customer.getKey())){
-			customers.get(customer.getKey()).addAccount(new Account("test", accountName, 0.0));
-			return "SUCCESS";
+	private String newAccount(CustomerID customer, String accountName) throws IOException {
+		ArrayList<Account> accounts = customers.get(customer.getKey()).getAccounts();
+		for (Account account : accounts){
+			if (account.getAccount().equals(accountName)){
+				return "Account Name already exists! Please try again";
+			}
 		}
-		return "FAIL";
+		String id = customers.get(customer.getKey()).getUserID() + "-" + (accounts.size()+1);
+		Account result = new Account(id, accountName, 0.0);
+		customers.get(customer.getKey()).addAccount(result);
+		DataHandler.updateAccountCSV(customers);
+		return "Account "+result.getAccount()+" is created, the account number is:" + result.getID();
+
 	}
 
 	private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException{
@@ -130,7 +137,7 @@ public class NewBank {
 		//Update the amount and return success
 		accFrom.updateBalance(-amount);
 		accTo.updateBalance(amount);
-		DataHandler.updateCustomer(customers);
+		DataHandler.updateAccountCSV(customers);
 		addTransaction(new Transaction(accFrom.getID(), accTo.getID(), amount, "Transfer"));
 		return value +  " has been moved from " + from + " to " + to;
 	}
@@ -176,18 +183,18 @@ public class NewBank {
 	}
 
 	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
-        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
-            throw new InvalidUserNameException();
+        if (customers.keySet().contains(username)) {
+            throw new InvalidUserNameException("Username already exists!");
         }
         String userID = generateUserID(customers);
         Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
-        customer.addAccount(new Account("test", "Main", 0.0));
+        customer.addAccount(new Account(userID+"-1", "Main", 0.0));
         customers.put(username, customer);
 		Response response = new Response();
 		response.setResponseMessage("Registration completed. Please Login with your username and password");
-		DataHandler.updateCustomer(customers);
+		DataHandler.updateCustomerCSV(customers);
+		DataHandler.updateAccountCSV(customers);
 		return response;
-        //addCustomerToDatabase(userID, customer);
     }
 
     
@@ -242,7 +249,7 @@ public class NewBank {
 
 	private void addTransaction(Transaction transaction) throws IOException{
 		transactions.add(transaction);
-		DataHandler.updateTransaction(this.transactions);
+		DataHandler.updateTransactionCSV(this.transactions);
 	}
 
 	
