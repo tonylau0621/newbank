@@ -15,245 +15,302 @@ import java.util.Random;
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
 
-	private static final NewBank bank = new NewBank();
-	private static LoanMarketplace loanMarketplace;
-	private HashMap<String,Customer> customers;
+  private static final NewBank bank = new NewBank();
+  private static LoanMarketplace loanMarketplace;
+  private HashMap<String, Customer> customers;
 
-	// Only use for testing
-	//public ArrayList<CustomerID> customersID;
+  // Only use for testing
+  //public ArrayList<CustomerID> customersID;
 
-	private NewBank() {
-		customers = new HashMap<>();
-		loanMarketplace = new LoanMarketplace();
-		addTestData();
-	}
+  private NewBank() {
+    customers = new HashMap<>();
+    loanMarketplace = new LoanMarketplace();
+    addTestData();
+  }
 
-	private void addTestData() {
-		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
-		bhagy.addAccount(new Account("Main", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
-		bhagy.addAccount(new Account("Savings", 1000.0));
-		bhagy.addAccount(new Account("Investment", 1000.0));
-		bhagy.addAccount(new Account("Current", 1000.0));
-		customers.put("Bhagy", bhagy);
+  private void addTestData() {
+    Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
+    bhagy.addAccount(new Account("Main", 1000.0));
+    bhagy.addAccount(new Account("TestingAccount1", 1000.0));
+    bhagy.addAccount(new Account("TestingAccount2", 1000.0));
+    bhagy.addAccount(new Account("Savings", 1000.0));
+    bhagy.addAccount(new Account("Investment", 1000.0));
+    bhagy.addAccount(new Account("Current", 1000.0));
+    customers.put("Bhagy", bhagy);
 
-		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
-		christina.addAccount(new Account("Main", 1500.0));
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
+    Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
+    christina.addAccount(new Account("Main", 1500.0));
+    christina.addAccount(new Account("Savings", 1500.0));
+    customers.put("Christina", christina);
 
-		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
-		john.addAccount(new Account("Main", 1200.0));
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
+    Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
+    john.addAccount(new Account("Main", 1200.0));
+    john.addAccount(new Account("Checking", 250.0));
+    customers.put("John", john);
 
-	}
+  }
 
-	public void addLoanData() {
-		// Loan
-		try {
-			loanMarketplace.offerLoan("00243584", "Main", 300.0);
-			loanMarketplace.offerLoan("18392702", "Main", 600.0);
-			loanMarketplace.offerLoan("18392702", "Savings", 200.0);
-			loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
-		} catch (Exception e) {
-		}
-	}
+  public void addLoanData() {
+    // Loan
+    try {
+      loanMarketplace.offerLoan("00243584", "Main", 300.0);
+      loanMarketplace.offerLoan("18392702", "Main", 600.0);
+      loanMarketplace.offerLoan("18392702", "Savings", 200.0);
+      loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
+    } catch (Exception e) {
+    }
+  }
 
-	public static NewBank getBank() {
-		return bank;
-	}
+  public static NewBank getBank() {
+    return bank;
+  }
 
-	public static LoanMarketplace getLoanMarketplace() {
-		return loanMarketplace;
-	}
+  public static LoanMarketplace getLoanMarketplace() {
+    return loanMarketplace;
+  }
 
-	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
-		boolean isValidUserName = (customers.containsKey(userName));
-		if(!isValidUserName) throw new InvalidUserNameException();
-		Customer targetCustomer = customers.get(userName);
-		CustomerID targetCustomerId = new CustomerID(userName);
-		boolean isValidPassword = (targetCustomer.checkPassword(password));
-		if(!isValidPassword) throw new InvalidPasswordException();
-		return targetCustomerId;
-	}
+  public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+    boolean isValidUserName = (customers.containsKey(userName));
+    if (!isValidUserName) throw new InvalidUserNameException();
+    Customer targetCustomer = customers.get(userName);
+    CustomerID targetCustomerId = new CustomerID(userName);
+    boolean isValidPassword = (targetCustomer.checkPassword(password));
+    if (!isValidPassword) throw new InvalidPasswordException();
+    return targetCustomerId;
+  }
 
 
-	// commands from the NewBank customer are processed in this method
-	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
-		String[] requestTokens = request.split("\\s+");
-		String requestFunction = requestTokens[0];
-		Response response = new Response();
-		response.setCustomer(customer);
-		switch(requestFunction) {
-			case "SHOWMYACCOUNTS" : {
-				response.setResponseMessage(showMyAccounts(customer));
-				return response;
-			}
-			case "NEWACCOUNT" :
-				if (requestTokens.length > 1) {
-					response.setResponseMessage(newAccount(customer, requestTokens[1]));
-					return response;
-				}
-				return null;
-			case "MOVE" :
-				if (requestTokens.length > 3) {
-					response.setResponseMessage(moveAmount(requestTokens[1], requestTokens[2], requestTokens[3], customer));
-					return response;
-				}
-				return null;
-			case "PAY" :
-				if (requestTokens.length > 4) {
-					response.setResponseMessage(payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2], requestTokens[3], requestTokens[4]));
-					return response;
-				}
-				return null;
-			case "LOGOUT" :
-				response.setCustomer(null);
-				response.setResponseMessage("Logout Successful.");
-				return response;
-
-			default : {
-				response.setResponseMessage("Invalid Input");
-				return response;
-			}
-		}
-	}
-
-	private String showMyAccounts(CustomerID customer) {
-		ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
-		String result = "";
-        for (int i=0; i< accounts.size(); i++){
-            result += String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
+  // commands from the NewBank customer are processed in this method
+  public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+    String[] requestTokens = request.split("\\s+");
+    String requestFunction = requestTokens[0];
+    Response response = new Response();
+    response.setCustomer(customer);
+    switch (requestFunction) {
+      case "SHOWMYACCOUNTS": {
+        response.setResponseMessage(showMyAccounts(customer));
+        return response;
+      }
+      case "NEWACCOUNT":
+        if (requestTokens.length > 1) {
+          response.setResponseMessage(newAccount(customer, requestTokens[1]));
+          return response;
         }
-		// To show mirco-loan details
-		result += this.getCustomer(customer).getLoanDetails();
-		return result;
-	}
-
-	private String newAccount(CustomerID customer, String accountName) {
-		if(customers.keySet().contains(customer.getKey())){
-			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
-			return "SUCCESS";
-		}
-		return "FAIL";
-	}
-
-	private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException{
-		double amount;
-		try{
-			amount = Double.parseDouble(value);
-		}catch(NumberFormatException e){
-			throw new InvalidAmountException();
-		}
-		//Negative amount
-		if (amount < 0.01){
-			throw new InvalidAmountException();
-		}
-
-		//Account does not exist
-		Customer target = customers.get(customer.getKey());
-		if (target.getAccount(from) == null || target.getAccount(to) == null){
-			throw new InvalidAccountException();
-		}
-
-		//Not enough balance
-		if (target.getAccount(from).getAmount() < amount){
-			throw new InsufficientBalanceException();
-		}
-		
-		//Update the amount and return success
-		target.getAccount(from).updateBalance(-amount);
-		target.getAccount(to).updateBalance(amount);
-		return value +  " has been moved from " + from + " to " + to;
-	}
-
-	// PAY command
-	//Do I want to use Accounts or Customers?
-	// payAmount: Takes two accounts and an amount as input
-	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-							 String receivingCustomerKey, String receivingAccount) {
-		//Account does not exist
-		Customer payer = customers.get(payingCustomer.getKey());
-		Customer receiver = customers.get(receivingCustomerKey);
-
-		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
-			//return "Please check Accounts";
-			return "FAIL";
-		}
-		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIL";}
-
-		//get Account Balance Amount
-		double balance = payer.getAccount(payingAccount).getAmount();
-		//Is there enough balance?
-		if(balance >= amount) {
-			//Adjust balance for both accounts
-			payer.getAccount(payingAccount).updateBalance(-amount);
-			receiver.getAccount(receivingAccount).updateBalance(amount);
-
-			//updated_balance = payer.getAccount(payingAccount).getAmount();
-
-			//return "Payment was successful.";
-			return "SUCCESS";
-		}
-		else {
-			//return "Insufficient balance.";
-			return "FAIL";
-		}
-
-	}
-
-	public Customer getCustomer(CustomerID id){
-		return customers.get(id.getKey());
-	}
-
-	public Customer getCustomer(String userID) {
-		Customer[] customerArr = customers.values().toArray(new Customer[0]);
-		for (int i = 0; i < customerArr.length; i++) {
-			if (customerArr[i].getUserID().equals(userID)) {
-				return customerArr[i];
-			}
-		}
-		return null;
-	}
-
-	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
-        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
-            throw new InvalidUserNameException();
+        break;
+      case "MOVE":
+        if (requestTokens.length > 3) {
+          response.setResponseMessage(moveAmount(requestTokens[1], requestTokens[2], requestTokens[3], customer));
+          return response;
         }
-        String userID = generateUserID(customers);
-        Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
-        customer.addAccount(new Account("Main", 0.0));
-        customers.put(username, customer);
-		Response response = new Response();
-		response.setResponseMessage("Registration completed. Please Login with your username and password");
-		return response;
-        //addCustomerToDatabase(userID, customer);
+        break;
+      case "PAY":
+        if (requestTokens.length > 4) {
+          response.setResponseMessage(payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2], requestTokens[3], requestTokens[4]));
+          return response;
+        }
+        break;
+      case "LEND":
+        if (requestTokens.length > 2) {
+          response.setResponseMessage(offerLoan(customer, requestTokens[1], Double.parseDouble(requestTokens[2])));
+          return response;
+        }
+        break;
+      case "TAKEBACK":
+        if (requestTokens.length > 2) {
+          response.setResponseMessage(takeBack(customer, requestTokens[1], Double.parseDouble(requestTokens[2])));
+          return response;
+        }
+        break;
+      case "BORROW":
+        if (requestTokens.length > 2) {
+          response.setResponseMessage(borrow(customer, requestTokens[1], Double.parseDouble(requestTokens[2])));
+          return response;
+        }
+        break;
+      case "REPAY":
+        if (requestTokens.length > 2) {
+          response.setResponseMessage(repay(customer, requestTokens[1], Double.parseDouble(requestTokens[2])));
+          return response;
+        }
+        break;
+      case "LOGOUT":
+        response.setCustomer(null);
+        response.setResponseMessage("Logout Successful.");
+        return response;
+
+    }
+    response.setResponseMessage("Invalid Input");
+    return response;
+  }
+
+  private String showMyAccounts(CustomerID customer) {
+    ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
+    String result = "";
+    for (int i = 0; i < accounts.size(); i++) {
+      result += String.valueOf(i + 1) + ") " + accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
+    }
+    // To show mirco-loan details
+    result += this.getCustomer(customer).getLoanDetails();
+    return result;
+  }
+
+  private String newAccount(CustomerID customer, String accountName) {
+    if (customers.keySet().contains(customer.getKey())) {
+      customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
+      return "SUCCESS";
+    }
+    return "FAIL";
+  }
+
+  private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+    double amount;
+    try {
+      amount = Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      throw new InvalidAmountException();
+    }
+    //Negative amount
+    if (amount < 0.01) {
+      throw new InvalidAmountException();
     }
 
-    
-    // If all 99999999 userIDs are occupied, this method will perform infinite loop.
-    // Can be changed to private for real use.
-    public static String generateUserID(HashMap<String,Customer> customers) {
-        Random ran = new Random();
-        generateAgain:
-        while (true) {
-            String userID = String.valueOf(ran.nextInt(99999999) + 1);
-            for (int i = userID.length(); i < 8; i++) {
-                userID = "0" + userID;
-            }
-
-            Customer[] customerArr = customers.values().toArray(new Customer[0]);
-            for (int i = 0; i < customerArr.length; i++) {
-                if (customerArr[i].getUserID().equals(userID)) {
-                    continue generateAgain;
-                }
-            }
-            return userID;
-        }
+    //Account does not exist
+    Customer target = customers.get(customer.getKey());
+    if (target.getAccount(from) == null || target.getAccount(to) == null) {
+      throw new InvalidAccountException();
     }
+
+    //Not enough balance
+    if (target.getAccount(from).getAmount() < amount) {
+      throw new InsufficientBalanceException();
+    }
+
+    //Update the amount and return success
+    target.getAccount(from).updateBalance(-amount);
+    target.getAccount(to).updateBalance(amount);
+    return value + " has been moved from " + from + " to " + to;
+  }
+
+  // PAY command
+  //Do I want to use Accounts or Customers?
+  // payAmount: Takes two accounts and an amount as input
+  private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
+                           String receivingCustomerKey, String receivingAccount) {
+    //Account does not exist
+    Customer payer = customers.get(payingCustomer.getKey());
+    Customer receiver = customers.get(receivingCustomerKey);
+
+    if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
+      //return "Please check Accounts";
+      return "FAIL";
+    }
+    //Customers should not be able to transfer less than 0.01
+    if (amount < 0.01) {
+      return "FAIL";
+    }
+
+    //get Account Balance Amount
+    double balance = payer.getAccount(payingAccount).getAmount();
+    //Is there enough balance?
+    if (balance >= amount) {
+      //Adjust balance for both accounts
+      payer.getAccount(payingAccount).updateBalance(-amount);
+      receiver.getAccount(receivingAccount).updateBalance(amount);
+
+      //updated_balance = payer.getAccount(payingAccount).getAmount();
+
+      //return "Payment was successful.";
+      return "SUCCESS";
+    } else {
+      //return "Insufficient balance.";
+      return "FAIL";
+    }
+
+  }
+
+  public Customer getCustomer(CustomerID id) {
+    return customers.get(id.getKey());
+  }
+
+  public Customer getCustomer(String userID) {
+    Customer[] customerArr = customers.values().toArray(new Customer[0]);
+    for (int i = 0; i < customerArr.length; i++) {
+      if (customerArr[i].getUserID().equals(userID)) {
+        return customerArr[i];
+      }
+    }
+    return null;
+  }
+
+  public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
+    if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
+      throw new InvalidUserNameException();
+    }
+    String userID = generateUserID();
+    Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
+    customer.addAccount(new Account("Main", 0.0));
+    customers.put(username, customer);
+    Response response = new Response();
+    response.setResponseMessage("Registration completed. Please Login with your username and password");
+    return response;
+    //addCustomerToDatabase(userID, customer);
+  }
+
+
+  // If all 99999999 userIDs are occupied, this method will perform infinite loop.
+  // Can be changed to private for real use.
+  public String generateUserID() {
+    Random ran = new Random();
+    generateAgain:
+    while (true) {
+      String userID = String.valueOf(ran.nextInt(99999999) + 1);
+      for (int i = userID.length(); i < 8; i++) {
+        userID = "0" + userID;
+      }
+
+      Customer[] customerArr = customers.values().toArray(new Customer[0]);
+      for (int i = 0; i < customerArr.length; i++) {
+        if (customerArr[i].getUserID().equals(userID)) {
+          continue generateAgain;
+        }
+      }
+      return userID;
+    }
+  }
+
+  private String offerLoan(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+    Customer lender = customers.get(customer.getKey());
+    if (loanMarketplace.offerLoan(lender.getUserID(), accountName, amount)) {
+      return "You have moved " + amount + " to the lending account.";
+    }
+    return "Failed to move " + amount + " to the lending account.";
+  }
+
+  private String takeBack(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+    Customer lender = customers.get(customer.getKey());
+    if (loanMarketplace.transferLendingAccountToOtherAccount(lender.getUserID(), accountName, amount)) {
+      return "You have moved " + amount + " from the lending account to " + accountName;
+    }
+    return "Failed to move " + amount + " from the lending account to " + accountName;
+  }
+
+  private String borrow(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InvalidAccountException {
+    Customer borrower = customers.get(customer.getKey());
+    if (loanMarketplace.processLoanRequest(borrower.getUserID(), accountName, amount)) {
+      return "You have borrowed " + amount + " and it has been sent to " + accountName +
+              "\nNote that the interest per loan is " + (loanMarketplace.getInterestPerLoan() * 100) + "%";
+    }
+    return "Failed to borrow " + amount;
+  }
+
+  private String repay(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+    Customer borrower = customers.get(customer.getKey());
+    amount = amount <= loanMarketplace.getLoanLimit() ? amount : loanMarketplace.getLoanLimit();
+    if (loanMarketplace.repayLoan(borrower.getUserID(), accountName, amount)) {
+      return "You have repaid " + amount;
+    }
+    return "Failed to repaid " + amount;
+  }
 
 	
 	/*// Only use for testing
@@ -270,8 +327,6 @@ public class NewBank {
 	public HashMap<String,Customer> getCustomers() {
 		return customers;
 	}*/
-	
-
 
 
 }

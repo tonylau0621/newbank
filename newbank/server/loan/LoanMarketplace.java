@@ -4,7 +4,6 @@ import newbank.server.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
 public class LoanMarketplace {
 
@@ -51,12 +50,13 @@ public class LoanMarketplace {
   }
 
   // If a customer is willing to lend an amount, call this method to generate an AvailableLoan object.
-  public boolean offerLoan(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException {
+  public boolean offerLoan(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
     Customer customer = NewBank.getBank().getCustomer(userID);
     if (customer != null) {
       Account account = customer.getAccount(accountName);
       if (account == null) throw new InvalidAccountException();
-      if (amount < 0.01 || account.getAmount() < amount) throw new InvalidAmountException();
+      if (amount < 0.01) throw new InvalidAmountException();
+      if (account.getAmount() < amount) throw new InsufficientBalanceException();
       account.updateBalance(-amount);
       AvailableLoan availableLoan = new AvailableLoan(customer.getUserID(), amount);
       addAvailableLoan(availableLoan);
@@ -65,13 +65,43 @@ public class LoanMarketplace {
     return false;
   }
 
+  public boolean transferLendingAccountToOtherAccount(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
+    Customer customer = NewBank.getBank().getCustomer(userID);
+    if (customer != null) {
+      Account account = customer.getAccount(accountName);
+      double totalAvailableLoans = customer.getTotalAvailableLoans();
+      if (account == null) throw new InvalidAccountException();
+      if (amount < 0.01) throw new InvalidAmountException();
+      if (totalAvailableLoans < amount) throw new InsufficientBalanceException();
+
+      ArrayList<AvailableLoan> availableLoans = customer.getAvailableLoans();
+      double remaining = amount;
+
+      for (int i = 0; i < availableLoans.size(); i++) {
+        AvailableLoan firstAvailableLoan = availableLoans.get(i);
+        if (!firstAvailableLoan.isStillAvailable()) continue;
+        if (remaining <= firstAvailableLoan.getAmount()) {
+          firstAvailableLoan.transferToAccount(customer, accountName, remaining);
+          remaining = 0;
+          break;
+        } else { // for the first AvailableLoan object cannot fulfil the (remaining) amount
+          remaining -= firstAvailableLoan.getAmount();
+          firstAvailableLoan.transferToAccount(customer, accountName, firstAvailableLoan.getAmount());
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
   // Generate Loan object(s) according to the order of AvailableLoan object(s)
   public boolean processLoanRequest(String borrowerUserID, String receivedAccountName, double amount) throws InvalidAccountException, InvalidAmountException {
     Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
+    double totalAvailableAmount = getTotalAvailableLoanAmount();
     if (borrower != null) {
       Account account = borrower.getAccount(receivedAccountName);
       if (account == null) throw new InvalidAccountException();
-      if (amount < 0.01) throw new InvalidAmountException();
+      if (amount < 0.01 || amount > totalAvailableAmount || amount > 3000) throw new InvalidAmountException();
       double remaining = amount;
 
       for (int i = 0; i < availableLoans.size(); i++) {
@@ -93,12 +123,13 @@ public class LoanMarketplace {
   }
 
   // After a borrower repay the loan, update the corresponding Loan objects and new AvailableLoan object(s) of the lender(s) is/are generated.
-  public boolean repayLoan(String borrowerUserID, String paidAccountName, double amount) throws InvalidAccountException, InvalidAmountException {
+  public boolean repayLoan(String borrowerUserID, String paidAccountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
     Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
     if (borrower != null) {
       Account account = borrower.getAccount(paidAccountName);
       if (account == null) throw new InvalidAccountException();
-      if (amount < 0.01 || account.getAmount() < amount) throw new InvalidAmountException();
+      if (amount < 0.01) throw new InvalidAmountException();
+      if (account.getAmount() < amount) throw new InsufficientBalanceException();
 
       ArrayList<Loan> borrowedLoans = borrower.getBorrowedLoans();
       double remaining = amount;

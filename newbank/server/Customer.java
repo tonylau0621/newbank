@@ -58,17 +58,17 @@ public class Customer {
 		double totalLentLoan = getTotalLentLoans();
 		double totalBorrowedLoan = getTotalBorrowedLoans();
 		if ((totalAvailableLoan + totalLentLoan) > 0) {
-			s += "Total amount in the lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
+			s += "Lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
 			s += "\tLent with interest: " + totalLentLoan + "\n";
-			s += "\tRepaid/Not lent: " + totalAvailableLoan + " (You may transfer up to this amount to other accounts.)\n";
+			s += "\tRepaid/Not lent: " + totalAvailableLoan + " (available to transfer to other accounts)\n";
 		}
 		if (totalBorrowedLoan > 0) {
-			s += "You still owes other customers " + totalBorrowedLoan + ".\n";
+			s += "Debt from other customers: " + totalBorrowedLoan + "\n";
 		}
 		return s;
 	}
 
-	private double getTotalAvailableLoans() {
+	public double getTotalAvailableLoans() {
 		double total = 0;
 		for (AvailableLoan aL : availableLoans) {
 			total += aL.getAmount();
@@ -123,6 +123,10 @@ public class Customer {
 
 	public ArrayList<Loan> getBorrowedLoans() {
 		return borrowedLoans;
+	}
+
+	public ArrayList<AvailableLoan> getAvailableLoans() {
+		return availableLoans;
 	}
 
 	public boolean checkPassword(String password) {

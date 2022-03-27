@@ -59,7 +59,6 @@ public class Loan implements Comparable<Loan> {
         allRepaid = true;
       }
       AvailableLoan availableLoan = new AvailableLoan(lenderUserID, realRepayAmount);
-      NewBank.getBank().getCustomer(lenderUserID).addAvailableLoan(availableLoan);
       NewBank.getBank().getLoanMarketplace().addAvailableLoan(availableLoan);
       return true;
     }

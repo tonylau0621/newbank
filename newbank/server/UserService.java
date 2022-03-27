@@ -90,4 +90,64 @@ public class UserService {
         }
 
     }
+
+    public static Response loan(CustomerID customerID) throws IOException {
+        Response response = new Response();
+        Customer customer = NewBank.getBank().getCustomer(customerID);
+        CommunicationService.sendOut("What do you want to do?\n 1) Put money to lending account\n 2) Take back money from the lending account" +
+                "\n 3) Borrow money\n 4) Repay money");
+        String functionRequest = CommunicationService.readIn();
+
+
+        String request = "";
+        String question1 = "";
+        String question2 = "";
+
+        switch (functionRequest) {
+            case "1":
+                request = "LEND";
+                question1 = "You have chosen putting money to lending account.\nPlease choose the account you want to send money from:";
+                question2 = "Please enter the amount you want to send:";
+                break;
+            case "2":
+                request = "TAKEBACK";
+                question1 = "You have chosen taking back lending money to other account.\nPlease choose the account you want to send money to:";
+                question2 = "Please enter the amount you want to take:";
+                break;
+            case "3":
+                request = "BORROW";
+                question1 = "You have chosen borrowing money.\nPlease choose the account you want to send the borrowed money to:";
+                question2 = "Please enter the amount you want to borrow:";
+                break;
+            case "4":
+                request = "REPAY";
+                question1 = "You have chosen repaying money.\nPlease choose the account you want to repay the borrowed money:";
+                question2 = "Please enter the amount you want to repay:";
+                break;
+        }
+
+        if (!request.equals("")) {
+            ArrayList<Account> accounts = customer.getAccounts();
+            CommunicationService.sendOut(question1);
+            String accountName = CommunicationService.readIn();
+            CommunicationService.sendOut(question2);
+            String amount = CommunicationService.readIn();
+
+
+            request = request + " " + accountName + " " + amount;
+            try {
+                return NewBank.getBank().processRequest(customerID, request);
+            } catch (InvalidAmountException e) {
+                e.printStackTrace();
+            } catch (InsufficientBalanceException e) {
+                e.printStackTrace();
+            } catch (InvalidAccountException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return null;
+    }
+
 }
