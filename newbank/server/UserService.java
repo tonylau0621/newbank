@@ -1,7 +1,13 @@
 package newbank.server;
 
+import newbank.form_service.Email;
+import newbank.form_service.Password;
+import newbank.form_service.Phone;
+import newbank.form_service.UserName;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserService {
@@ -65,18 +71,14 @@ public class UserService {
 
     //Add new customer
     public static Response newCustomer() throws IOException, InterruptedException{
-        CommunicationService.sendOut("Enter Username");
-        String userName = CommunicationService.readIn();
-        CommunicationService.sendOut("Enter Password");
-        String password = CommunicationService.readIn();
+        String userName = new UserName().getInput();
+        String password = new Password().getInput();
         CommunicationService.sendOut("Enter Firstname");
         String firstname = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Lastname");
         String lastname = CommunicationService.readIn();
-        CommunicationService.sendOut("Enter Phone");
-        String phone = CommunicationService.readIn();
-        CommunicationService.sendOut("Enter Email");
-        String email = CommunicationService.readIn();
+        String phone = new Phone().getInput();
+        String email = new Email().getInput();
         CommunicationService.sendOut("Enter Address");
         String address = CommunicationService.readIn();
         //Send to Newbank
