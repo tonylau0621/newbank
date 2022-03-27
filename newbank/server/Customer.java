@@ -2,6 +2,7 @@ package newbank.server;
 
 import newbank.server.loan.AvailableLoan;
 import newbank.server.loan.Loan;
+import newbank.server.loan.LoanMarketplace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +21,7 @@ public class Customer {
 	private ArrayList<AvailableLoan> availableLoans;
 	private ArrayList<Loan> lentLoans;
 	private ArrayList<Loan> borrowedLoans;
+	private double remainingLoanLimit;
 
 	public Customer(String userID, String password, String firstName, String lastName, String phone, String email, String address) {
 		this.userID = userID;
@@ -56,7 +58,7 @@ public class Customer {
 		String s = "";
 		double totalAvailableLoan = getTotalAvailableLoans();
 		double totalLentLoan = getTotalLentLoans();
-		double totalBorrowedLoan = getTotalBorrowedLoans();
+		double totalBorrowedLoan = getTotalRemainingDebt();
 		if ((totalAvailableLoan + totalLentLoan) > 0) {
 			s += "Lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
 			s += "\tLent with interest: " + totalLentLoan + "\n";
@@ -76,7 +78,7 @@ public class Customer {
 		return total;
 	}
 
-	private double getTotalLentLoans() {
+	public double getTotalLentLoans() {
 		double total = 0;
 		for (Loan lL : lentLoans) {
 			total += lL.getRemainingAmount();
@@ -84,12 +86,16 @@ public class Customer {
 		return total;
 	}
 
-	private double getTotalBorrowedLoans() {
+	public double getTotalRemainingDebt() {
 		double total = 0;
 		for (Loan bL: borrowedLoans) {
 			total += bL.getRemainingAmount();
 		}
 		return total;
+	}
+
+	public double getRemainingLoanLimit() {
+		return LoanMarketplace.getLoanLimit() - getTotalRemainingDebt() / (1 + LoanMarketplace.getInterestPerLoan());
 	}
 
 

@@ -5,6 +5,7 @@ import newbank.server.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+// Not thread safe
 public class LoanMarketplace {
 
   private static double interestPerLoan = 0.05;
@@ -104,6 +105,7 @@ public class LoanMarketplace {
       if (amount < 0.01 || amount > totalAvailableAmount || amount > 3000) throw new InvalidAmountException();
       double remaining = amount;
 
+      // For the available loans lent by customers, first-in-first-lend
       for (int i = 0; i < availableLoans.size(); i++) {
         AvailableLoan firstAvailableLoan = availableLoans.get(i);
         if (!firstAvailableLoan.isStillAvailable()) continue;

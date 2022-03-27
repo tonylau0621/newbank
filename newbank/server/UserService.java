@@ -1,5 +1,7 @@
 package newbank.server;
 
+import newbank.server.loan.LoanMarketplace;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -94,6 +96,7 @@ public class UserService {
     public static Response loan(CustomerID customerID) throws IOException {
         Response response = new Response();
         Customer customer = NewBank.getBank().getCustomer(customerID);
+
         CommunicationService.sendOut("What do you want to do?\n 1) Put money to lending account\n 2) Take back money from the lending account" +
                 "\n 3) Borrow money\n 4) Repay money");
         String functionRequest = CommunicationService.readIn();
@@ -110,24 +113,38 @@ public class UserService {
                 question2 = "Please enter the amount you want to send:";
                 break;
             case "2":
-                request = "TAKEBACK";
-                question1 = "You have chosen taking back lending money to other account.\nPlease choose the account you want to send money to:";
-                question2 = "Please enter the amount you want to take:";
+                if (customer.getTotalAvailableLoans() > 0) {
+                    request = "TAKEBACK";
+                    question1 = "You have chosen taking back lending money to other account.\nPlease choose the account you want to send money to:";
+                    question2 = "Please enter the amount you want to take:";
+                } else {
+                    CommunicationService.sendOut("You don't have any available amount can be transferred.");
+                }
                 break;
             case "3":
                 request = "BORROW";
-                question1 = "You have chosen borrowing money.\nPlease choose the account you want to send the borrowed money to:";
+                question1 = "You have chosen borrowing money.\n";
+                question1 += "Total available loan amount in the market: " + NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount() + "\n";
+                question1 += "Amount you have borrowed: " + (customer.getTotalRemainingDebt() / (1 + LoanMarketplace.getInterestPerLoan())) + "\n";
+                question1 += "Amount you can borrow: " + customer.getRemainingLoanLimit() + "\n";
+                question1 += "Please choose the account you want to send the borrowed money to:";
                 question2 = "Please enter the amount you want to borrow:";
                 break;
             case "4":
-                request = "REPAY";
-                question1 = "You have chosen repaying money.\nPlease choose the account you want to repay the borrowed money:";
-                question2 = "Please enter the amount you want to repay:";
+                if (customer.getTotalRemainingDebt() > 0) {
+                    request = "REPAY";
+                    question1 = "You have chosen repaying money.\nPlease choose the account you want to repay the borrowed money:";
+                    question2 = "Please enter the amount you want to repay:";
+                } else {
+                    CommunicationService.sendOut("You don't have any debt.");
+                }
                 break;
         }
 
         if (!request.equals("")) {
             ArrayList<Account> accounts = customer.getAccounts();
+            CommunicationService.sendOut("Your accounts details:");
+            CommunicationService.sendOut(NewBank.getBank().showMyAccounts(customerID));
             CommunicationService.sendOut(question1);
             String accountName = CommunicationService.readIn();
             CommunicationService.sendOut(question2);
@@ -136,18 +153,22 @@ public class UserService {
 
             request = request + " " + accountName + " " + amount;
             try {
+                if (accountName.contains(" ")) throw new InvalidAccountException();
+                try {
+                    Double.parseDouble(amount);
+                } catch (NumberFormatException e) {
+                    throw new InvalidAmountException();
+                }
                 return NewBank.getBank().processRequest(customerID, request);
-            } catch (InvalidAmountException e) {
-                e.printStackTrace();
-            } catch (InsufficientBalanceException e) {
-                e.printStackTrace();
-            } catch (InvalidAccountException e) {
-                e.printStackTrace();
+            } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+                response.setCustomer(customerID);
+                response.setResponseMessage(e.getMessage());
+                return response;
             }
         }
-
-
-        return null;
+        response.setCustomer(customerID);
+        response.setResponseMessage("");
+        return response;
     }
 
 }

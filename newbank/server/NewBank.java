@@ -53,10 +53,12 @@ public class NewBank {
   public void addLoanData() {
     // Loan
     try {
-      loanMarketplace.offerLoan("00243584", "Main", 300.0);
-      loanMarketplace.offerLoan("18392702", "Main", 600.0);
-      loanMarketplace.offerLoan("18392702", "Savings", 200.0);
-      loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
+      loanMarketplace.offerLoan("00243584", "Main", 800.0);
+      loanMarketplace.offerLoan("00243584", "Savings", 950.0);
+      loanMarketplace.offerLoan("00243584", "Investment", 400.0);
+      loanMarketplace.offerLoan("18392702", "Main", 987.0);
+      loanMarketplace.offerLoan("18392702", "Savings", 1275.0);
+      //loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
     } catch (Exception e) {
     }
   }
@@ -143,7 +145,7 @@ public class NewBank {
     return response;
   }
 
-  private String showMyAccounts(CustomerID customer) {
+  public String showMyAccounts(CustomerID customer) {
     ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
     String result = "";
     for (int i = 0; i < accounts.size(); i++) {
@@ -296,6 +298,9 @@ public class NewBank {
 
   private String borrow(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InvalidAccountException {
     Customer borrower = customers.get(customer.getKey());
+
+    double borrowLimit = Math.min(borrower.getRemainingLoanLimit(), loanMarketplace.getTotalAvailableLoanAmount());
+    amount = amount <= borrowLimit ? amount : borrowLimit;
     if (loanMarketplace.processLoanRequest(borrower.getUserID(), accountName, amount)) {
       return "You have borrowed " + amount + " and it has been sent to " + accountName +
               "\nNote that the interest per loan is " + (loanMarketplace.getInterestPerLoan() * 100) + "%";
@@ -305,7 +310,6 @@ public class NewBank {
 
   private String repay(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
     Customer borrower = customers.get(customer.getKey());
-    amount = amount <= loanMarketplace.getLoanLimit() ? amount : loanMarketplace.getLoanLimit();
     if (loanMarketplace.repayLoan(borrower.getUserID(), accountName, amount)) {
       return "You have repaid " + amount;
     }

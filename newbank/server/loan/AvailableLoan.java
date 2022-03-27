@@ -3,10 +3,11 @@ package newbank.server.loan;
 import newbank.server.Customer;
 import newbank.server.NewBank;
 
-// first-in-first-lend
+// An object of this class records a loan which a customer is willing to lend.
+// Not thread safe
 public class AvailableLoan implements Comparable<AvailableLoan> {
   private static long maxAvailableLoanID = 0;
-  private final long availableLoanID; // lower value, sooner to be lent
+  private final long availableLoanID;
   private final String lenderUserID;
   private double amount;
   private boolean stillAvailable;
