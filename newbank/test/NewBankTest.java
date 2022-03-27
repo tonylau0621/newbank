@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -57,7 +58,13 @@ public class NewBankTest {
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndValidNewAccountCommand")
   public void validNewAccountCommand(CustomerID customerID, String command) {
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
     Customer customer = customers.get(customerID.getKey());
     ArrayList<Account> accounts = customer.getAccounts();
     String accountType = command.split("\\s+")[1];
@@ -83,8 +90,18 @@ public class NewBankTest {
       accountsBeforeCommand.add(new Account(customer.getAccounts().get(i).getAccount(), customer.getAccounts().get(i).getAmount()));
     }
     */
-
-    Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      try {
+        processRequestResult = bank.processRequest(customerID, command);
+      } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
     ArrayList<Account> accountsAfterCommand = customer.getAccounts();
     Assertions.assertEquals(accountsBeforeCommand.size(), accountsAfterCommand.size());
     for (int i = 0; i < accountsBeforeCommand.size(); i++) {
@@ -118,19 +135,25 @@ public class NewBankTest {
 
     Double account1OldBalance = account1.getAmount();
     Double account2OldBalance = account2.getAmount();
-
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
 
     Assertions.assertEquals(account1OldBalance - amount, account1.getAmount());
     Assertions.assertEquals(account2OldBalance + amount, account2.getAmount());
 
   }
 
-  @ParameterizedTest
+  /*@ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidMoveCommand")
   public void invalidMoveCommand(CustomerID customerID, String command) {
     invalidNewAccountCommand(customerID, command);
   }
+  */
 
   // Assume customer has the corresponding accounts.
   @ParameterizedTest
@@ -154,8 +177,13 @@ public class NewBankTest {
 
     Double account1OldBalance = account1.getAmount();
     Double account2OldBalance = account2.getAmount();
-
-    Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
 
     Assertions.assertEquals(account1OldBalance, account1.getAmount());
     Assertions.assertEquals(account2OldBalance, account2.getAmount());
@@ -177,8 +205,13 @@ public class NewBankTest {
 
     Double payerAccountOriginalAmount = payerAccount.getAmount();
     Double receiverAccountOriginalAmount = receiverAccount.getAmount();
-
-    Assertions.assertEquals("SUCCESS", bank.processRequest(customerID, command));
+    Response processRequestResult = new Response();
+    try {
+      processRequestResult = bank.processRequest(customerID, command);
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+      e.printStackTrace();
+    }
+    Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
 
     Double payerAccountNewAmount = payerAccount.getAmount();
     Double receiverAccountNewAmount = receiverAccount.getAmount();
@@ -217,8 +250,18 @@ public class NewBankTest {
         if (payerAccount != null && receiverAccount != null) {
           Double payerAccountOriginalAmount = payerAccount.getAmount();
           Double receiverAccountOriginalAmount = receiverAccount.getAmount();
-
-          Assertions.assertEquals("FAIL", bank.processRequest(customerID, command));
+          Response processRequestResult = new Response();
+          try {
+            try {
+              processRequestResult = bank.processRequest(customerID, command);
+            } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
 
           Double payerAccountNewAmount = payerAccount.getAmount();
           Double receiverAccountNewAmount = receiverAccount.getAmount();
@@ -233,6 +276,25 @@ public class NewBankTest {
 
   }
   // End of tests for PAY
+
+
+  // Test for generateUserId method
+  // Change the modifier of the method to public before test.
+  @Test
+  public void generateManyUniqueUserID() {
+    String[] userIDs = new String[20000];
+    for (int i = 0; i < userIDs.length; i++) {
+      userIDs[i] = bank.generateUserID(customers);
+      customers.put("testingUser"+i, new Customer(userIDs[i], "", "", "", "", "", ""));
+      //System.out.println(userIDs[i]);
+      for (int j = 0; j < i; j++) {
+        if (userIDs[i].equals(userIDs[j])) {
+          fail("There exists a duplicated user id. " + i);
+        }
+      }
+    }
+  }
+
 
 
   @AfterEach

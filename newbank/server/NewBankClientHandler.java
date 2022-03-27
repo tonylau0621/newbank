@@ -14,53 +14,38 @@ public class NewBankClientHandler extends Thread {
 	
 	
 	public NewBankClientHandler(Socket s) throws IOException {
+		CommunicationService.initialCommunication(s);
 		bank = NewBank.getBank();
-		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-		out = new PrintWriter(s.getOutputStream(), true);
+		in = CommunicationService.getBufferedReader();
+		out = CommunicationService.getPrintWriter();
 	}
 	
 	public void run() {
 		// keep getting requests from the client and processing them
 		try {
-			while (true) {
-				// ask for user name
-				out.println("Enter Username");
-				String userName = in.readLine();
-				// ask for password
-				out.println("Enter Password");
-				String password = in.readLine();
-				out.println("Checking Details...");
-				// authenticate user and get customer ID token from bank for use in subsequent requests
-				CustomerID customer = null;
-				try {
-					customer = bank.checkLogInDetails(userName, password);
-				} catch (InvalidUserNameException iue) {
-					out.println("Log In Failed");
-					out.println(iue.getMessage());
-				} catch (InvalidPasswordException ipe) {
-					out.println("Log In Failed");
-					out.println(ipe.getMessage());
-				}
-				// if the user is authenticated then get requests from the user and process them
-				if (customer != null) {
-					out.println("Log In Successful. What do you want to do?");
-					while(true) {
-						String request = in.readLine();
-						System.out.println("Request from " + customer.getKey());
-						switch(request) {
-							case "MOVE" :
-								request = runMove(customer);
-								break;
-						}
-						String response = bank.processRequest(customer, request);
-						out.println(response);
-					}
+			CustomerID customer = null;
+			String message;
+			while(true) {
+				//If not logged in, ask customer to login
+				CommunicationService.cleanTerminal();
+				Response response = null;
+				if (customer == null){
+					customer = welcomePage();
+				}else{
+					//Show other service if logged in
+					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Logout");
+					String request = in.readLine();
+					response = sendRequest(customer, request);
+					customer = response.getCustomer();
+					message = response.getResponseMessage();
+					out.println(message);
+					out.println("Press enter to go back to main menu.");
+					request = in.readLine();
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		} finally {
-			out.println("finally");
 			try {
 				in.close();
 				out.close();
@@ -71,21 +56,49 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
-	private String runMove(CustomerID customer){
-		try{
-			out.println("From:");
-			String from = in.readLine();
-			out.println("To:");
-			String to = in.readLine();
-			out.println("Amount:");
-			String amount = in.readLine();
-			if (!from.contains(" ") && !to.contains(" ") && !amount.contains(" ")) {
-				return "MOVE " + amount + " " + from + " " + to;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+		String toSend = "";
+		switch(request){
+			case "1":
+				toSend = "SHOWMYACCOUNTS";
+				break;
+			case "2":
+				return UserService.move(customer);
+			case "3":
+				toSend = "PAY";
+				break;
+			case "4":
+				toSend = "LOGOUT";
+				break;
+			case "L2":
+				return UserService.newCustomer();
+			default:
+				toSend = "";
 		}
-		return "";
+		try {
+			return bank.processRequest(customer, toSend);
+		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	private CustomerID welcomePage() throws IOException, InterruptedException{
+		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
+		String input = in.readLine();
+		if (input.equals("1")){
+			return UserService.login();
+
+		}
+		else if (input.equals("2")){
+			Response response = sendRequest(null, "L"+input);
+			if (response != null){
+				String message = response.getResponseMessage();
+				out.println(message);
+				out.println("Press enter to go back to main menu.");
+				input = in.readLine();
+			}
+		}
+		return null;
+	}
 }
