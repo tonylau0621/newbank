@@ -16,6 +16,7 @@ public class NewBankClientHandler extends Thread {
 	public NewBankClientHandler(Socket s) throws IOException {
 		CommunicationService.initialCommunication(s);
 		bank = NewBank.getBank();
+		bank.addLoanData();
 		in = CommunicationService.getBufferedReader();
 		out = CommunicationService.getPrintWriter();
 	}

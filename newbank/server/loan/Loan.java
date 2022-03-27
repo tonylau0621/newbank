@@ -3,8 +3,8 @@ package newbank.server.loan;
 import newbank.server.Customer;
 import newbank.server.NewBank;
 
-public class Loan {
-  private static long totalNumberOfLoan = 0;
+public class Loan implements Comparable<Loan> {
+  private static long maxLoanID = 0;
   private final long loanID;
   private final String lenderUserID;
   private final String borrowerUserID;
@@ -13,7 +13,7 @@ public class Loan {
   private boolean allRepaid;
 
   public Loan(String lenderUserID, String borrowerUserID, double loanAmount) {
-    loanID = ++totalNumberOfLoan;
+    loanID = ++maxLoanID;
     this.lenderUserID = lenderUserID;
     this.borrowerUserID = borrowerUserID;
     this.loanAmount = loanAmount;
@@ -22,7 +22,7 @@ public class Loan {
   }
 
   public void getTotalNumberOfLoanFromDatabase() {
-    totalNumberOfLoan = 0; // should be got from database
+    maxLoanID = 0; // should be got from database
   }
 
   public long getLoanID() {
@@ -49,7 +49,8 @@ public class Loan {
     return allRepaid;
   }
 
-  public AvailableLoan repayLoan(Customer customer, String accountName, double repayAmount) {
+  // After the borrower repay the loan, update the loan fields and the repaid amount will become a new AvailableLoan object of the lender.
+  public boolean repayLoan(Customer customer, String accountName, double repayAmount) {
     if (customer.getUserID().equals(borrowerUserID) && customer.getAccount(accountName) != null && repayAmount > 0 && customer.getAccount(accountName).getAmount() >= repayAmount) {
       double realRepayAmount = repayAmount < remainingAmount ? repayAmount : remainingAmount;
       customer.getAccount(accountName).updateBalance(-realRepayAmount);
@@ -59,10 +60,15 @@ public class Loan {
       }
       AvailableLoan availableLoan = new AvailableLoan(lenderUserID, realRepayAmount);
       NewBank.getBank().getCustomer(lenderUserID).addAvailableLoan(availableLoan);
-      return availableLoan;
+      NewBank.getBank().getLoanMarketplace().addAvailableLoan(availableLoan);
+      return true;
     }
-    return null;
+    return false;
   }
 
-
+  @Override
+  public int compareTo(Loan o) {
+    if (loanID == o.loanID) return 0;
+    return loanID < o.loanID ? -1 : 1;
+  }
 }

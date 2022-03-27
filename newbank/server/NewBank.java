@@ -48,25 +48,17 @@ public class NewBank {
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
 
+	}
+
+	public void addLoanData() {
 		// Loan
-
-		AvailableLoan aL1 = new AvailableLoan("00243584", 800.0);
-		bhagy.addAvailableLoan(aL1);
-
-		AvailableLoan aL2 = new AvailableLoan("18392702", 300.0);
-		AvailableLoan aL3 = new AvailableLoan("18392702", 200.0);
-		christina.addAvailableLoan(aL2);
-		christina.addAvailableLoan(aL3);
-
-		loanMarketplace.putAvailableLoan(aL1);
-		loanMarketplace.putAvailableLoan(aL2);
-		loanMarketplace.putAvailableLoan(aL3);
-
-		Loan loan1 = new Loan("00243584", "60023945", 700.0);
-		bhagy.addLentLoan(loan1);
-		john.addBorrowedLoan(loan1);
-
-		loanMarketplace.putLoan(loan1);
+		try {
+			loanMarketplace.offerLoan("00243584", "Main", 300.0);
+			loanMarketplace.offerLoan("18392702", "Main", 600.0);
+			loanMarketplace.offerLoan("18392702", "Savings", 200.0);
+			loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
+		} catch (Exception e) {
+		}
 	}
 
 	public static NewBank getBank() {
@@ -136,7 +128,7 @@ public class NewBank {
             result += String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
         }
 		// To show mirco-loan details
-		result += this.getCustomer(customer).showLoanDetails();
+		result += this.getCustomer(customer).getLoanDetails();
 		return result;
 	}
 

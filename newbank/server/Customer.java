@@ -4,6 +4,7 @@ import newbank.server.loan.AvailableLoan;
 import newbank.server.loan.Loan;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Customer {
 
@@ -51,14 +52,14 @@ public class Customer {
 		return s;
 	}
 
-	public String showLoanDetails() {
+	public String getLoanDetails() {
 		String s = "";
 		double totalAvailableLoan = getTotalAvailableLoans();
 		double totalLentLoan = getTotalLentLoans();
 		double totalBorrowedLoan = getTotalBorrowedLoans();
 		if ((totalAvailableLoan + totalLentLoan) > 0) {
 			s += "Total amount in the lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
-			s += "\tLent: " + totalLentLoan + "\n";
+			s += "\tLent with interest: " + totalLentLoan + "\n";
 			s += "\tRepaid/Not lent: " + totalAvailableLoan + " (You may transfer up to this amount to other accounts.)\n";
 		}
 		if (totalBorrowedLoan > 0) {
@@ -69,10 +70,8 @@ public class Customer {
 
 	private double getTotalAvailableLoans() {
 		double total = 0;
-		System.out.println("testing1");
 		for (AvailableLoan aL : availableLoans) {
 			total += aL.getAmount();
-			System.out.println("testing2");
 		}
 		return total;
 	}
@@ -109,14 +108,21 @@ public class Customer {
 
 	public void addAvailableLoan(AvailableLoan availableLoan) {
 		availableLoans.add(availableLoan);
+		Collections.sort(availableLoans);
 	}
 
 	public void addLentLoan(Loan loan) {
 		lentLoans.add(loan);
+		Collections.sort(lentLoans);
 	}
 
 	public void addBorrowedLoan(Loan loan) {
 		borrowedLoans.add(loan);
+		Collections.sort(borrowedLoans);
+	}
+
+	public ArrayList<Loan> getBorrowedLoans() {
+		return borrowedLoans;
 	}
 
 	public boolean checkPassword(String password) {
