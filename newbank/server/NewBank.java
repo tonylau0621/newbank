@@ -248,7 +248,7 @@ public class NewBank {
 	}
 
 	private void addTransaction(Transaction transaction) throws IOException{
-		transactions.add(transaction);
+		transactions.add(0, transaction);
 		DataHandler.updateTransactionCSV(this.transactions);
 	}
 
