@@ -7,10 +7,13 @@ import newbank.form_service.UserName;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class UserService {
+    public static final Integer MAX_LOGIN_ATTEMPT = 3;
+    public static Map<String, Integer> userMapByLoginAttempt = new HashMap<>();
     public static CustomerID login() throws IOException, InterruptedException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
@@ -23,7 +26,7 @@ public class UserService {
         CustomerID customer = null;
         try {
             customer = NewBank.getBank().checkLogInDetails(userName, password);
-        } catch (InvalidUserNameException | InvalidPasswordException iue) {
+        } catch (InvalidUserNameException | InvalidPasswordException | MaxLoginAttemptReachException iue) {
             CommunicationService.sendOut("Log In Failed");
             Thread.sleep(500);
             CommunicationService.errorAndWait(iue);
