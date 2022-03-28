@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch NewBankServer",
+            "request": "launch",
+            "mainClass": "newbank.server.NewBankServer",
+            "projectName": "newbank_aed5b0a5"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -24,7 +31,6 @@
             "mainClass": "newbank.server.NewBankServer",
             "projectName": "newbank_474bbc19"
         }
-        
     ],
     "compounds": [
         {

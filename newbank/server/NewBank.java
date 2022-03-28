@@ -13,12 +13,14 @@ public class NewBank {
 
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
+	private HashMap<String,Admin> admins;
 
 	// Only use for testing
 	//public ArrayList<CustomerID> customersID;
 
 	private NewBank() {
 		customers = new HashMap<>();
+		admins = new HashMap<>();
 		addTestData();
 	}
 
@@ -41,6 +43,9 @@ public class NewBank {
 		john.addAccount(new Account("Main", 1200.0));
 		john.addAccount(new Account("Checking", 250.0));
 		customers.put("John", john);
+
+		Admin admin = new Admin("32462385", "adminPass", "", "", "", "", "");
+		admins.put("Admin", admin);
 	}
 
 	public static NewBank getBank() {
@@ -51,7 +56,17 @@ public class NewBank {
 		boolean isValidUserName = (customers.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
 		Customer targetCustomer = customers.get(userName);
-		CustomerID targetCustomerId = new CustomerID(userName);
+		CustomerID targetCustomerId = new CustomerID(userName, false);
+		boolean isValidPassword = (targetCustomer.checkPassword(password));
+		if(!isValidPassword) throw new InvalidPasswordException();
+		return targetCustomerId;
+	}
+
+	public synchronized CustomerID adminLogin(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+		boolean isValidUserName = (admins.containsKey(userName));
+		if(!isValidUserName) throw new InvalidUserNameException();
+		Admin targetCustomer = admins.get(userName);
+		CustomerID targetCustomerId = new CustomerID(userName, true);
 		boolean isValidPassword = (targetCustomer.checkPassword(password));
 		if(!isValidPassword) throw new InvalidPasswordException();
 		return targetCustomerId;
@@ -186,7 +201,7 @@ public class NewBank {
 	}
 
 	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
-        if (username.matches("[a-zA-Z0-9_-]{5,20}") || customers.keySet().contains(username)) {
+        if (customers.keySet().contains(username)) {
             throw new InvalidUserNameException();
         }
         String userID = generateUserID(customers);
