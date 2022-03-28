@@ -1,19 +1,10 @@
 package newbank.server;
 
-import newbank.form_service.Email;
-import newbank.form_service.Password;
-import newbank.form_service.Phone;
-import newbank.form_service.UserName;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class UserService {
-    public static final Integer MAX_LOGIN_ATTEMPT = 3;
-    public static Map<String, Integer> userMapByLoginAttempt = new HashMap<>();
     public static CustomerID login() throws IOException, InterruptedException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
@@ -72,25 +63,46 @@ public class UserService {
         }
     }
 
-    public static String unlockUser() throws IOException, InvalidUserNameException {
-        CommunicationService.sendOut("Enter username to unlock");
-        String username = CommunicationService.readIn();
-        boolean isValidUserName = (NewBank.getBank().getCustomers().containsKey(username));
-        if(!isValidUserName) throw new InvalidUserNameException();
-        UserService.userMapByLoginAttempt.put(username, 0);
-        return username + " has been unlocked.";
+    public static Response pay(CustomerID customerID) throws IOException{
+        Response response = new Response();
+        //ArrayList<Account> accounts = showAccounts(customerID);
+        CommunicationService.sendOut("Please choose the account you want to use for payment");
+        String payingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the user you want to send money to");
+        String receivingCustomerKey = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the account you want to send money to");
+        String receivingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please enter the amount you want to send:");
+        String amount = CommunicationService.readIn();
+        String request;
+        try {
+            try{
+                request = "PAY" + " " + amount + " " + payingAccount  + " " + receivingCustomerKey + " " + receivingAccount;
+            }catch (NumberFormatException | IndexOutOfBoundsException ne){
+                throw new InvalidAccountException();
+            }
+            return NewBank.getBank().processRequest(customerID, request);
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }
     }
 
     //Add new customer
     public static Response newCustomer() throws IOException, InterruptedException{
-        String userName = new UserName().getInput();
-        String password = new Password().getInput();
+        CommunicationService.sendOut("Enter Username");
+        String userName = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Password");
+        String password = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Firstname");
         String firstname = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Lastname");
         String lastname = CommunicationService.readIn();
-        String phone = new Phone().getInput();
-        String email = new Email().getInput();
+        CommunicationService.sendOut("Enter Phone");
+        String phone = CommunicationService.readIn();
+        CommunicationService.sendOut("Enter Email");
+        String email = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Address");
         String address = CommunicationService.readIn();
         //Send to Newbank
