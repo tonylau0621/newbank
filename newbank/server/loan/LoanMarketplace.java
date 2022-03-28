@@ -78,16 +78,16 @@ public class LoanMarketplace {
       ArrayList<AvailableLoan> availableLoans = customer.getAvailableLoans();
       double remaining = amount;
 
-      for (int i = 0; i < availableLoans.size(); i++) {
-        AvailableLoan firstAvailableLoan = availableLoans.get(i);
-        if (!firstAvailableLoan.isStillAvailable()) continue;
-        if (remaining <= firstAvailableLoan.getAmount()) {
-          firstAvailableLoan.transferToAccount(customer, accountName, remaining);
+      for (int i = availableLoans.size() - 1; i >= 0 ; i--) {
+        AvailableLoan lastAvailableLoan = availableLoans.get(i);
+        if (!lastAvailableLoan.isStillAvailable()) continue;
+        if (remaining <= lastAvailableLoan.getAmount()) {
+          lastAvailableLoan.transferToAccount(customer, accountName, remaining);
           remaining = 0;
           break;
-        } else { // for the first AvailableLoan object cannot fulfil the (remaining) amount
-          remaining -= firstAvailableLoan.getAmount();
-          firstAvailableLoan.transferToAccount(customer, accountName, firstAvailableLoan.getAmount());
+        } else { // for the last AvailableLoan object cannot fulfil the (remaining) amount
+          remaining -= lastAvailableLoan.getAmount();
+          lastAvailableLoan.transferToAccount(customer, accountName, lastAvailableLoan.getAmount());
         }
       }
       return true;
@@ -95,7 +95,7 @@ public class LoanMarketplace {
     return false;
   }
 
-  // Generate Loan object(s) according to the order of AvailableLoan object(s)
+  // If a customer borrows money, call this method to generate Loan object(s) according to the order of AvailableLoan object(s)
   public boolean processLoanRequest(String borrowerUserID, String receivedAccountName, double amount) throws InvalidAccountException, InvalidAmountException {
     Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
     double totalAvailableAmount = getTotalAvailableLoanAmount();
