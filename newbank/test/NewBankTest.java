@@ -36,7 +36,7 @@ public class NewBankTest {
     try {
       CustomerID customerID = bank.checkLogInDetails(username, password);
       Assertions.assertEquals(username, customerID.getKey());
-    } catch (InvalidUserNameException | InvalidPasswordException e) {
+    } catch (InvalidUserNameException | InvalidPasswordException | MaxLoginAttemptReachException e) {
       fail("Correct username and password but login fail");
     }
   }
@@ -46,7 +46,7 @@ public class NewBankTest {
   public void logInWithWrongUsernameAndPassword(String username, String password) {
     try {
       CustomerID customerID = bank.checkLogInDetails(username, password);
-    } catch (InvalidUserNameException | InvalidPasswordException e) {
+    } catch (InvalidUserNameException | InvalidPasswordException | MaxLoginAttemptReachException e) {
       return;
     }
     fail("Logged in with wrong username and/or password");
