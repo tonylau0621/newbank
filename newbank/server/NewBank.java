@@ -52,13 +52,28 @@ public class NewBank {
 		return bank;
 	}
 
-	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException, MaxLoginAttemptReachException {
 		boolean isValidUserName = (customers.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
+		if(UserService.userMapByLoginAttempt.containsKey(userName)) {
+			Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
+			if(userLoginAttempt >= UserService.MAX_LOGIN_ATTEMPT) throw new MaxLoginAttemptReachException();
+		}
 		Customer targetCustomer = customers.get(userName);
 		CustomerID targetCustomerId = new CustomerID(userName, false);
 		boolean isValidPassword = (targetCustomer.checkPassword(password));
-		if(!isValidPassword) throw new InvalidPasswordException();
+		if(!isValidPassword) {
+			if(!UserService.userMapByLoginAttempt.containsKey(userName)) {
+				UserService.userMapByLoginAttempt.put(userName, 1);
+			} else {
+				Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
+				if(userLoginAttempt < UserService.MAX_LOGIN_ATTEMPT) {
+					userLoginAttempt++;
+					UserService.userMapByLoginAttempt.put(userName, userLoginAttempt);
+				}
+			}
+			throw new InvalidPasswordException();
+		}
 		return targetCustomerId;
 	}
 
