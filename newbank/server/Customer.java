@@ -12,7 +12,6 @@ public class Customer {
 	private String email;
 	private String address;
 	private ArrayList<Account> accounts;
-	private ArrayList<Transaction> transactions;
 
 	public Customer(String userID, String password, String firstName, String lastName, String phone, String email, String address) {
 		this.userID = userID;

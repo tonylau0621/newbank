@@ -37,7 +37,8 @@ public class DataHandler {
                 Transaction transaction = new Transaction(line[0],line[1],line[2],line[3],line[4],line[5]);
                 transactions.add(transaction);
             }
-            Collections.sort(transactions);
+            //Sort the transaction by the date
+            Collections.sort(transactions, Collections.reverseOrder());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,7 +54,7 @@ public class DataHandler {
             line = scanner.nextLine().split(",");
             //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",");
+                line = scanner.nextLine().split(",", -1);
                 getComma(line);
                 Customer customer = new Customer(line[0],line[2],line[3],line[4],line[5],line[6], line[7]);
                 customers.put(line[1],customer);
