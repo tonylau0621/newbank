@@ -65,11 +65,20 @@ public class UserService {
                 throw new InvalidAccountException();
             }
             return NewBank.getBank().processRequest(customerID, request);
-        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
             response.setCustomer(customerID);
             response.setResponseMessage(e.getMessage());
             return response;
         }
+    }
+
+    public static String unlockUser() throws IOException, InvalidUserNameException {
+        CommunicationService.sendOut("Enter username to unlock");
+        String username = CommunicationService.readIn();
+        boolean isValidUserName = (NewBank.getBank().getCustomers().containsKey(username));
+        if(!isValidUserName) throw new InvalidUserNameException();
+        UserService.userMapByLoginAttempt.put(username, 0);
+        return username + " has been unlocked.";
     }
 
     //Add new customer

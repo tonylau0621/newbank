@@ -89,7 +89,7 @@ public class NewBank {
 
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
 		String[] requestTokens = request.split("\\s+");
 		String requestFunction = requestTokens[0];
 		Response response = new Response();
@@ -121,7 +121,9 @@ public class NewBank {
 				response.setCustomer(null);
 				response.setResponseMessage("Logout Successful.");
 				return response;
-
+			case "UNLOCKUSER":
+				response.setResponseMessage(UserService.unlockUser());
+				return response;
 			default : {
 				response.setResponseMessage("Invalid Input");
 				return response;
@@ -214,6 +216,8 @@ public class NewBank {
 	public Customer getCustomer(CustomerID id){
 		return customers.get(id.getKey());
 	}
+
+	public HashMap<String,Customer> getCustomers() { return customers; }
 
 	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
         if (customers.keySet().contains(username)) {
