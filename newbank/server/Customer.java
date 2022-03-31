@@ -14,7 +14,7 @@ public class Customer extends User{
 		// Deep copy
 		ArrayList<Account> accountsCopy = new ArrayList<>();
 		for (int i = 0; i < accounts.size(); i++) {
-			accountsCopy.add(new Account(accounts.get(i).getAccount(), accounts.get(i).getAmount()));
+			accountsCopy.add(new Account(accounts.get(i).getID(), accounts.get(i).getAccount(), accounts.get(i).getAmount()));
 		}
 		return accountsCopy;
 	}
@@ -39,5 +39,4 @@ public class Customer extends User{
 		}
 		return null;
 	}
-
 }

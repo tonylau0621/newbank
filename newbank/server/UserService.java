@@ -72,6 +72,54 @@ public class UserService {
         }
     }
 
+    public static Response pay(CustomerID customerID) throws IOException{
+        Response response = new Response();
+        //ArrayList<Account> accounts = showAccounts(customerID);
+        CommunicationService.sendOut("Please choose the account you want to use for payment");
+        String payingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the user you want to send money to");
+        String receivingCustomerKey = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the account you want to send money to");
+        String receivingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please enter the amount you want to send:");
+        String amount = CommunicationService.readIn();
+        String request;
+        try {
+            try{
+                request = "PAY" + " " + amount + " " + payingAccount  + " " + receivingCustomerKey + " " + receivingAccount;
+            }catch (NumberFormatException | IndexOutOfBoundsException ne){
+                throw new InvalidAccountException();
+            }
+            return NewBank.getBank().processRequest(customerID, request);
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }
+    }
+
+    public static Response newAccount(CustomerID customerID) throws IOException {
+        Response response = new Response();
+        CommunicationService.sendOut("Enter Account Name");
+        String accName = CommunicationService.readIn();
+        try{
+            if ((!accName.equals("")) && (accName.matches("^[a-zA-Z]*$"))){
+                String request = "NEWACCOUNT " +accName;
+                return NewBank.getBank().processRequest(customerID, request);
+            }else{
+                throw new InvalidAccountException();
+            }
+        }catch (InvalidAmountException | InsufficientBalanceException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }catch (InvalidAccountException iae){
+            response.setCustomer(customerID);
+            response.setResponseMessage("Illegal Account Name");
+            return response;
+        }
+    }
+
     public static String unlockUser() throws IOException, InvalidUserNameException {
         CommunicationService.sendOut("Enter username to unlock");
         String username = CommunicationService.readIn();
@@ -97,7 +145,7 @@ public class UserService {
         try {
             return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
         } catch (InvalidUserNameException e) {
-            CommunicationService.sendOut("Log In Failed");
+            CommunicationService.sendOut("Registration Failed");
             Thread.sleep(500);
             CommunicationService.errorAndWait(e);
             return null;

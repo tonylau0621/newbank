@@ -4,6 +4,8 @@ package newbank.server;
 ///mport java.util.ArrayList;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -13,37 +15,20 @@ public class NewBank {
 
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
+	private ArrayList<Transaction> transactions;
 	private HashMap<String,Admin> admins;
 
 	// Only use for testing
 	//public ArrayList<CustomerID> customersID;
 
 	private NewBank() {
-		customers = new HashMap<>();
-		admins = new HashMap<>();
-		addTestData();
+		customers = DataHandler.readCustData();
+		transactions = DataHandler.readTransation();
+    admins = new HashMap<>();
+    addTestData();
 	}
 
 	private void addTestData() {
-		Customer bhagy = new Customer("00243584", "bhagyPass", "Bhagy", "Brown", "07654321987", "bhagyishappy@gmail.com", "123 Wonder Street, London AB1 2YZ");
-		bhagy.addAccount(new Account("Main", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount1", 1000.0));
-		bhagy.addAccount(new Account("TestingAccount2", 1000.0));
-		bhagy.addAccount(new Account("Savings", 1000.0));
-		bhagy.addAccount(new Account("Investment", 1000.0));
-		bhagy.addAccount(new Account("Current", 1000.0));
-		customers.put("Bhagy", bhagy);
-
-		Customer christina = new Customer("18392702", "christinaPass", "", "", "", "", "");
-		christina.addAccount(new Account("Main", 1500.0));
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-
-		Customer john = new Customer("60023945", "johnPass", "", "", "", "", "");
-		john.addAccount(new Account("Main", 1200.0));
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
-
 		Admin admin = new Admin("32462385", "adminPass", "", "", "", "", "");
 		admins.put("Admin", admin);
 	}
@@ -121,6 +106,9 @@ public class NewBank {
 				response.setCustomer(null);
 				response.setResponseMessage("Logout Successful.");
 				return response;
+			case "TRANSACTIONRECORD":
+				response.setResponseMessage(getTransactionRecord(customer));
+				return response;
 			case "UNLOCKUSER":
 				response.setResponseMessage(UserService.unlockUser());
 				return response;
@@ -140,15 +128,22 @@ public class NewBank {
 		return result;
 	}
 
-	private String newAccount(CustomerID customer, String accountName) {
-		if(customers.keySet().contains(customer.getKey())){
-			customers.get(customer.getKey()).addAccount(new Account(accountName, 0.0));
-			return "SUCCESS";
+	private String newAccount(CustomerID customer, String accountName) throws IOException {
+		ArrayList<Account> accounts = customers.get(customer.getKey()).getAccounts();
+		for (Account account : accounts){
+			if (account.getAccount().equals(accountName)){
+				return "Account Name already exists! Please try again";
+			}
 		}
-		return "FAIL";
+		String id = customers.get(customer.getKey()).getUserID() + "-" + (accounts.size()+1);
+		Account result = new Account(id, accountName, 0.0);
+		customers.get(customer.getKey()).addAccount(result);
+		DataHandler.updateAccountCSV(customers);
+		return "Account "+result.getAccount()+" is created, the account number is:" + result.getID();
+
 	}
 
-	private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException{
+	private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException{
 		double amount;
 		try{
 			amount = Double.parseDouble(value);
@@ -162,18 +157,22 @@ public class NewBank {
 
 		//Account does not exist
 		Customer target = customers.get(customer.getKey());
-		if (target.getAccount(from) == null || target.getAccount(to) == null){
+		Account accFrom = target.getAccount(from);
+		Account accTo = target.getAccount(to);
+		if (accFrom == null || accTo == null){
 			throw new InvalidAccountException();
 		}
 
 		//Not enough balance
-		if (target.getAccount(from).getAmount() < amount){
+		if (accFrom.getAmount() < amount){
 			throw new InsufficientBalanceException();
 		}
 		
 		//Update the amount and return success
-		target.getAccount(from).updateBalance(-amount);
-		target.getAccount(to).updateBalance(amount);
+		accFrom.updateBalance(-amount);
+		accTo.updateBalance(amount);
+		DataHandler.updateAccountCSV(customers);
+		addTransaction(new Transaction(accFrom.getID(), accTo.getID(), amount, "Transfer"));
 		return value +  " has been moved from " + from + " to " + to;
 	}
 
@@ -187,11 +186,11 @@ public class NewBank {
 		Customer receiver = customers.get(receivingCustomerKey);
 
 		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
-			//return "Please check Accounts";
-			return "FAIL";
+			return "Please check Accounts";
+
 		}
 		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIL";}
+		if(amount < 0.01) {return "Invalid amount";}
 
 		//get Account Balance Amount
 		double balance = payer.getAccount(payingAccount).getAmount();
@@ -204,11 +203,10 @@ public class NewBank {
 			//updated_balance = payer.getAccount(payingAccount).getAmount();
 
 			//return "Payment was successful.";
-			return "SUCCESS";
+			return "Payment successful";
 		}
 		else {
-			//return "Insufficient balance.";
-			return "FAIL";
+			return "Insufficient balance.";
 		}
 
 	}
@@ -219,18 +217,19 @@ public class NewBank {
 
 	public HashMap<String,Customer> getCustomers() { return customers; }
 
-	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException {
+  public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
         if (customers.keySet().contains(username)) {
-            throw new InvalidUserNameException();
+            throw new InvalidUserNameException("Username already exists!");
         }
         String userID = generateUserID(customers);
         Customer customer = new Customer(userID, password, firstName, lastName, phone, email, address);
-        customer.addAccount(new Account("Main", 0.0));
+        customer.addAccount(new Account(userID+"-1", "Main", 0.0));
         customers.put(username, customer);
 		Response response = new Response();
 		response.setResponseMessage("Registration completed. Please Login with your username and password");
+		DataHandler.updateCustomerCSV(customers);
+		DataHandler.updateAccountCSV(customers);
 		return response;
-        //addCustomerToDatabase(userID, customer);
     }
 
     
@@ -254,6 +253,39 @@ public class NewBank {
             return userID;
         }
     }
+
+	private String getTransactionRecord(CustomerID customer){
+		ArrayList<Transaction> transactionRecord = getLast10Transactions(customer);
+		String result;
+		DateTimeFormatter datetime = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
+		if (transactionRecord.size() == 0){
+			return "No record found";
+		}else{
+			result = "Date       Time  Type     From       To         Amount\n";
+			for (Transaction t : transactionRecord){
+				result += datetime.format(t.getDT()) +" "+t.getType()+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
+			}
+		}
+		return result;
+	}
+
+	private ArrayList<Transaction> getLast10Transactions(CustomerID customer){
+		//get UserID
+		String userID = customers.get(customer.getKey()).getUserID();
+		ArrayList<Transaction> result = new ArrayList<>();
+		for (int i = 0; i < transactions.size(); i++){
+			if (transactions.get(i).getFrom().split("-")[0].equals(userID) || transactions.get(i).getTo().split("-")[0].equals(userID)){
+				result.add(transactions.get(i));
+			}
+			if (result.size() == 10) break;
+		}
+		return result;
+	}
+
+	private void addTransaction(Transaction transaction) throws IOException{
+		transactions.add(0, transaction);
+		DataHandler.updateTransactionCSV(this.transactions);
+	}
 
 	
 	/*// Only use for testing
