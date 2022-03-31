@@ -77,4 +77,6 @@ public class User {
 	public String getUserID() {
 		return userID;
 	}
+
+	public String getPassword() { return password; }
 }

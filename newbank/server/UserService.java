@@ -1,10 +1,19 @@
 package newbank.server;
 
+import newbank.form_service.Email;
+import newbank.form_service.Password;
+import newbank.form_service.Phone;
+import newbank.form_service.UserName;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class UserService {
+    public static final Integer MAX_LOGIN_ATTEMPT = 3;
+    public static Map<String, Integer> userMapByLoginAttempt = new HashMap<>();
     public static CustomerID login() throws IOException, InterruptedException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
@@ -89,7 +98,7 @@ public class UserService {
         }
     }
 
-    public static Response newAccount(CustomerID customerID) throws IOException{
+    public static Response newAccount(CustomerID customerID) throws IOException {
         Response response = new Response();
         CommunicationService.sendOut("Enter Account Name");
         String accName = CommunicationService.readIn();
@@ -100,7 +109,7 @@ public class UserService {
             }else{
                 throw new InvalidAccountException();
             }
-        }catch (InvalidAmountException | InsufficientBalanceException e) {
+        }catch (InvalidAmountException | InsufficientBalanceException | InvalidUserNameException e) {
             response.setCustomer(customerID);
             response.setResponseMessage(e.getMessage());
             return response;
@@ -111,29 +120,31 @@ public class UserService {
         }
     }
 
+    public static String unlockUser() throws IOException, InvalidUserNameException {
+        CommunicationService.sendOut("Enter username to unlock");
+        String username = CommunicationService.readIn();
+        boolean isValidUserName = (NewBank.getBank().getCustomers().containsKey(username));
+        if(!isValidUserName) throw new InvalidUserNameException();
+        UserService.userMapByLoginAttempt.put(username, 0);
+        return username + " has been unlocked.";
+    }
+
     //Add new customer
     public static Response newCustomer() throws IOException, InterruptedException{
-        try {
-        CommunicationService.sendOut("Enter Username");
-        String userName = CommunicationService.readIn();
-        if (!userName.matches("^[A-Za-z0-9]{5,15}$")){
-            throw new InvalidUserNameException("Invalid User Name");
-        }
-        CommunicationService.sendOut("Enter Password");
-        String password = CommunicationService.readIn();
+        String userName = new UserName().getInput();
+        String password = new Password().getInput();
         CommunicationService.sendOut("Enter Firstname");
         String firstname = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Lastname");
         String lastname = CommunicationService.readIn();
-        CommunicationService.sendOut("Enter Phone");
-        String phone = CommunicationService.readIn();
-        CommunicationService.sendOut("Enter Email");
-        String email = CommunicationService.readIn();
+        String phone = new Phone().getInput();
+        String email = new Email().getInput();
         CommunicationService.sendOut("Enter Address");
         String address = CommunicationService.readIn();
         //Send to Newbank
-        return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
-        }catch (InvalidUserNameException e) {
+        try {
+            return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
+        } catch (InvalidUserNameException e) {
             CommunicationService.sendOut("Registration Failed");
             Thread.sleep(500);
             CommunicationService.errorAndWait(e);

@@ -39,8 +39,4 @@ public class Customer extends User{
 		}
 		return null;
 	}
-
-	public String getPassword(){
-		return password;
-	}
 }
