@@ -16,6 +16,7 @@ public class NewBank {
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
 	private ArrayList<Transaction> transactions;
+	private HashMap<String,Admin> admins;
 
 	// Only use for testing
 	//public ArrayList<CustomerID> customersID;
@@ -23,17 +24,49 @@ public class NewBank {
 	private NewBank() {
 		customers = DataHandler.readCustData();
 		transactions = DataHandler.readTransation();
+    admins = new HashMap<>();
+    addTestData();
+	}
+
+	private void addTestData() {
+		Admin admin = new Admin("32462385", "adminPass", "", "", "", "", "");
+		admins.put("Admin", admin);
 	}
 
 	public static NewBank getBank() {
 		return bank;
 	}
 
-	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException, MaxLoginAttemptReachException {
 		boolean isValidUserName = (customers.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
+		if(UserService.userMapByLoginAttempt.containsKey(userName)) {
+			Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
+			if(userLoginAttempt >= UserService.MAX_LOGIN_ATTEMPT) throw new MaxLoginAttemptReachException();
+		}
 		Customer targetCustomer = customers.get(userName);
-		CustomerID targetCustomerId = new CustomerID(userName);
+		CustomerID targetCustomerId = new CustomerID(userName, false);
+		boolean isValidPassword = (targetCustomer.checkPassword(password));
+		if(!isValidPassword) {
+			if(!UserService.userMapByLoginAttempt.containsKey(userName)) {
+				UserService.userMapByLoginAttempt.put(userName, 1);
+			} else {
+				Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
+				if(userLoginAttempt < UserService.MAX_LOGIN_ATTEMPT) {
+					userLoginAttempt++;
+					UserService.userMapByLoginAttempt.put(userName, userLoginAttempt);
+				}
+			}
+			throw new InvalidPasswordException();
+		}
+		return targetCustomerId;
+	}
+
+	public synchronized CustomerID adminLogin(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
+		boolean isValidUserName = (admins.containsKey(userName));
+		if(!isValidUserName) throw new InvalidUserNameException();
+		Admin targetCustomer = admins.get(userName);
+		CustomerID targetCustomerId = new CustomerID(userName, true);
 		boolean isValidPassword = (targetCustomer.checkPassword(password));
 		if(!isValidPassword) throw new InvalidPasswordException();
 		return targetCustomerId;
@@ -41,7 +74,7 @@ public class NewBank {
 
 
 	// commands from the NewBank customer are processed in this method
-	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
 		String[] requestTokens = request.split("\\s+");
 		String requestFunction = requestTokens[0];
 		Response response = new Response();
@@ -73,11 +106,12 @@ public class NewBank {
 				response.setCustomer(null);
 				response.setResponseMessage("Logout Successful.");
 				return response;
-			
 			case "TRANSACTIONRECORD":
 				response.setResponseMessage(getTransactionRecord(customer));
 				return response;
-
+			case "UNLOCKUSER":
+				response.setResponseMessage(UserService.unlockUser());
+				return response;
 			default : {
 				response.setResponseMessage("Invalid Input");
 				return response;
@@ -152,11 +186,11 @@ public class NewBank {
 		Customer receiver = customers.get(receivingCustomerKey);
 
 		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
-			//return "Please check Accounts";
-			return "FAIL";
+			return "Please check Accounts";
+
 		}
 		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIL";}
+		if(amount < 0.01) {return "Invalid amount";}
 
 		//get Account Balance Amount
 		double balance = payer.getAccount(payingAccount).getAmount();
@@ -169,11 +203,10 @@ public class NewBank {
 			//updated_balance = payer.getAccount(payingAccount).getAmount();
 
 			//return "Payment was successful.";
-			return "SUCCESS";
+			return "Payment successful";
 		}
 		else {
-			//return "Insufficient balance.";
-			return "FAIL";
+			return "Insufficient balance.";
 		}
 
 	}
@@ -182,7 +215,9 @@ public class NewBank {
 		return customers.get(id.getKey());
 	}
 
-	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
+	public HashMap<String,Customer> getCustomers() { return customers; }
+
+  public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
         if (customers.keySet().contains(username)) {
             throw new InvalidUserNameException("Username already exists!");
         }

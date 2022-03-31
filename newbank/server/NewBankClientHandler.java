@@ -31,7 +31,18 @@ public class NewBankClientHandler extends Thread {
 				Response response = null;
 				if (customer == null){
 					customer = welcomePage();
-				}else{
+				} else if (customer != null && customer.isAdmin()) {
+					// go to admin menu
+					out.println("Hello, " + customer.getKey() +".\n\nWhat would you like to do today? \n\n 1) Unlock User \n 2) Logout");
+					String request = in.readLine();
+					out.println("Processing admin request...");
+					response = sendAdminRequest(customer, request);
+					customer = response.getCustomer();
+					message = response.getResponseMessage();
+					out.println(message);
+					out.println("Press enter to continue");
+					request = in.readLine();
+				} else {
 					//Show other service if logged in
 					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Create New Account\n 5) View Transaction History\n 6) Logout");
 					String request = in.readLine();
@@ -65,8 +76,7 @@ public class NewBankClientHandler extends Thread {
 			case "2":
 				return UserService.move(customer);
 			case "3":
-				toSend = "PAY";
-				break;
+				return UserService.pay(customer);
 			case "4":
 				return UserService.newAccount(customer);
 			case "5":
@@ -82,7 +92,27 @@ public class NewBankClientHandler extends Thread {
 		}
 		try {
 			return bank.processRequest(customer, toSend);
-		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+		String toSend = "";
+		switch(request){
+			case "1":
+				toSend = "UNLOCKUSER";
+				break;
+			case "2":
+				toSend = "LOGOUT";
+				break;
+			default:
+				toSend = "";
+		}
+		try {
+			return bank.processRequest(customer, toSend);
+		} catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -93,7 +123,6 @@ public class NewBankClientHandler extends Thread {
 		String input = in.readLine();
 		if (input.equals("1")){
 			return UserService.login();
-
 		}
 		else if (input.equals("2")){
 			Response response = sendRequest(null, "L"+input);
@@ -103,6 +132,9 @@ public class NewBankClientHandler extends Thread {
 				out.println("Press enter to go back to main menu.");
 				input = in.readLine();
 			}
+		}
+		else if (input.equals("adminLogin")){
+			return AdminService.login();
 		}
 		return null;
 	}

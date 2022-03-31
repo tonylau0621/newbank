@@ -17,7 +17,7 @@ public class UserService {
         CustomerID customer = null;
         try {
             customer = NewBank.getBank().checkLogInDetails(userName, password);
-        } catch (InvalidUserNameException | InvalidPasswordException iue) {
+        } catch (InvalidUserNameException | InvalidPasswordException | MaxLoginAttemptReachException iue) {
             CommunicationService.sendOut("Log In Failed");
             Thread.sleep(500);
             CommunicationService.errorAndWait(iue);
@@ -56,7 +56,33 @@ public class UserService {
                 throw new InvalidAccountException();
             }
             return NewBank.getBank().processRequest(customerID, request);
-        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException e) {
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }
+    }
+
+    public static Response pay(CustomerID customerID) throws IOException{
+        Response response = new Response();
+        //ArrayList<Account> accounts = showAccounts(customerID);
+        CommunicationService.sendOut("Please choose the account you want to use for payment");
+        String payingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the user you want to send money to");
+        String receivingCustomerKey = CommunicationService.readIn();
+        CommunicationService.sendOut("Please choose the account you want to send money to");
+        String receivingAccount = CommunicationService.readIn();
+        CommunicationService.sendOut("Please enter the amount you want to send:");
+        String amount = CommunicationService.readIn();
+        String request;
+        try {
+            try{
+                request = "PAY" + " " + amount + " " + payingAccount  + " " + receivingCustomerKey + " " + receivingAccount;
+            }catch (NumberFormatException | IndexOutOfBoundsException ne){
+                throw new InvalidAccountException();
+            }
+            return NewBank.getBank().processRequest(customerID, request);
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
             response.setCustomer(customerID);
             response.setResponseMessage(e.getMessage());
             return response;
