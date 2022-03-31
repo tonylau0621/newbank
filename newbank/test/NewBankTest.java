@@ -125,11 +125,11 @@ public class NewBankTest {
     Account account1 = customer.getAccount(account1Name);
     Account account2 = customer.getAccount(account2Name);
     if (account1 == null) {
-      account1 = new Account(account1Name, 9999.0);
+      account1 = new Account("test",account1Name, 9999.0);
       customer.addAccount(account1);
     }
     if (account2 == null) {
-      account2 = new Account(account2Name, 9999.0);
+      account2 = new Account("test",account2Name, 9999.0);
       customer.addAccount(account2);
     }
 
@@ -167,11 +167,11 @@ public class NewBankTest {
     Account account1 = customer.getAccount(account1Name);
     Account account2 = customer.getAccount(account2Name);
     if (account1 == null) {
-      account1 = new Account(account1Name, 9999.0);
+      account1 = new Account("test", account1Name, 9999.0);
       customer.addAccount(account1);
     }
     if (account2 == null) {
-      account2 = new Account(account2Name, 9999.0);
+      account2 = new Account("test",account2Name, 9999.0);
       customer.addAccount(account2);
     }
 

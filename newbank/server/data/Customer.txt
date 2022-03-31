@@ -1,0 +1,7 @@
+id, username, password, firstName, lastName, phone, email, address
+30970859,beckywong,beckywongPW,Becky,Wong,,,
+60023945,John,johnPass, , , , , 
+47971955,Josh,joshPass,Josh,Man,000,0.0,000#se2#0000#se2#0000
+18392702,Christina,christinaPass, , , , , 
+01513347,newuserTesting,testingPW,Test, , ,   ,  
+00243584,Bhagy,bhagyPass,Bhagy,Brown,07654321987,bhagyishappy@gmail.com,123 Wonder Street#se2# London AB1 2YZ

@@ -89,10 +89,36 @@ public class UserService {
         }
     }
 
+    public static Response newAccount(CustomerID customerID) throws IOException{
+        Response response = new Response();
+        CommunicationService.sendOut("Enter Account Name");
+        String accName = CommunicationService.readIn();
+        try{
+            if ((!accName.equals("")) && (accName.matches("^[a-zA-Z]*$"))){
+                String request = "NEWACCOUNT " +accName;
+                return NewBank.getBank().processRequest(customerID, request);
+            }else{
+                throw new InvalidAccountException();
+            }
+        }catch (InvalidAmountException | InsufficientBalanceException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }catch (InvalidAccountException iae){
+            response.setCustomer(customerID);
+            response.setResponseMessage("Illegal Account Name");
+            return response;
+        }
+    }
+
     //Add new customer
     public static Response newCustomer() throws IOException, InterruptedException{
+        try {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
+        if (!userName.matches("^[A-Za-z0-9]{5,15}$")){
+            throw new InvalidUserNameException("Invalid User Name");
+        }
         CommunicationService.sendOut("Enter Password");
         String password = CommunicationService.readIn();
         CommunicationService.sendOut("Enter Firstname");
@@ -106,10 +132,9 @@ public class UserService {
         CommunicationService.sendOut("Enter Address");
         String address = CommunicationService.readIn();
         //Send to Newbank
-        try {
-            return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
-        } catch (InvalidUserNameException e) {
-            CommunicationService.sendOut("Log In Failed");
+        return NewBank.getBank().addCustomer(userName, password, firstname, lastname, phone, email, address);
+        }catch (InvalidUserNameException e) {
+            CommunicationService.sendOut("Registration Failed");
             Thread.sleep(500);
             CommunicationService.errorAndWait(e);
             return null;
