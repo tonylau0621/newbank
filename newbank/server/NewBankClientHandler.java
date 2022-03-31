@@ -76,8 +76,7 @@ public class NewBankClientHandler extends Thread {
 			case "2":
 				return UserService.move(customer);
 			case "3":
-				toSend = "PAY";
-				break;
+				return UserService.pay(customer);
 			case "4":
 				toSend = "LOGOUT";
 				break;

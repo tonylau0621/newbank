@@ -187,11 +187,11 @@ public class NewBank {
 		Customer receiver = customers.get(receivingCustomerKey);
 
 		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
-			//return "Please check Accounts";
-			return "FAIL";
+			return "Please check Accounts";
+
 		}
 		//Customers should not be able to transfer less than 0.01
-		if(amount < 0.01) {return "FAIL";}
+		if(amount < 0.01) {return "Invalid amount";}
 
 		//get Account Balance Amount
 		double balance = payer.getAccount(payingAccount).getAmount();
@@ -204,11 +204,10 @@ public class NewBank {
 			//updated_balance = payer.getAccount(payingAccount).getAmount();
 
 			//return "Payment was successful.";
-			return "SUCCESS";
+			return "Payment successful";
 		}
 		else {
-			//return "Insufficient balance.";
-			return "FAIL";
+			return "Insufficient balance.";
 		}
 
 	}
