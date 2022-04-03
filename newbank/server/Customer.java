@@ -59,13 +59,16 @@ public class Customer {
 		double totalAvailableLoan = getTotalAvailableLoans();
 		double totalLentLoan = getTotalLentLoans();
 		double totalBorrowedLoan = getTotalRemainingDebt();
+		int accNum = accounts.size();
 		if ((totalAvailableLoan + totalLentLoan) > 0) {
-			s += "Lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
-			s += "\tLent with interest: " + totalLentLoan + "\n";
-			s += "\tRepaid/Not lent: " + totalAvailableLoan + " (available to transfer to other accounts)\n";
+			s += "----------\n";
+			s += (++accNum) + ") Lending account: " + (totalAvailableLoan + totalLentLoan) + ", where\n";
+			s += String.format("%25s", "Lent with interest: ") + totalLentLoan + "\n";
+			s += String.format("%25s", "Repaid/Not lent: ") + totalAvailableLoan + " (available to transfer to other accounts)\n";
 		}
 		if (totalBorrowedLoan > 0) {
-			s += "Debt from other customers: " + totalBorrowedLoan + "\n";
+			s += "----------\n";
+			s += (++accNum) + ") Debt from other customers: " + totalBorrowedLoan + "\n";
 		}
 		return s;
 	}

@@ -124,9 +124,9 @@ public class UserService {
             case "3":
                 request = "BORROW";
                 question1 = "You have chosen borrowing money.\n";
-                question1 += "Total available loan amount in the market: " + NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount() + "\n";
+                question1 += "Total available loan amount in the market: " + NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount(customer.getUserID()) + "\n";
                 question1 += "Amount you have borrowed: " + (customer.getTotalRemainingDebt() / (1 + LoanMarketplace.getInterestPerLoan())) + "\n";
-                question1 += "Amount you can borrow: " + customer.getRemainingLoanLimit() + "\n";
+                question1 += "Amount you can borrow: " + Math.min(customer.getRemainingLoanLimit(), NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount(customer.getUserID())) + "\n";
                 question1 += "Please choose the account you want to send the borrowed money to:";
                 question2 = "Please enter the amount you want to borrow:";
                 break;

@@ -4,7 +4,6 @@ import newbank.server.Customer;
 import newbank.server.NewBank;
 
 // An object of this class records a loan offer which a customer is willing to lend.
-// Not thread safe
 public class AvailableLoan implements Comparable<AvailableLoan> {
   private static long maxAvailableLoanID = 0;
   private final long availableLoanID;

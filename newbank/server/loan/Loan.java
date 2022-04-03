@@ -4,7 +4,6 @@ import newbank.server.Customer;
 import newbank.server.NewBank;
 
 // An object of this class records a loan status
-// Not thread safe
 public class Loan implements Comparable<Loan> {
   private static long maxLoanID = 0;
   private final long loanID;

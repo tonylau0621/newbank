@@ -5,7 +5,6 @@ import newbank.server.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-// Not thread safe
 public class LoanMarketplace {
 
   private static double interestPerLoan = 0.05;
@@ -34,6 +33,16 @@ public class LoanMarketplace {
     return total;
   }
 
+  // Calculate total available loan amount except the borrower's
+  public double getTotalAvailableLoanAmount(String borrowerUserID) {
+    Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
+    double total = getTotalAvailableLoanAmount();
+    if (borrower != null) {
+      total -= borrower.getTotalAvailableLoans();
+    }
+    return total;
+  }
+
   public void addAvailableLoan(AvailableLoan availableLoan) {
     availableLoans.add(availableLoan);
     Collections.sort(availableLoans);
@@ -51,7 +60,7 @@ public class LoanMarketplace {
   }
 
   // If a customer is willing to lend an amount, call this method to generate an AvailableLoan object.
-  public boolean offerLoan(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
+  public synchronized boolean offerLoan(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
     Customer customer = NewBank.getBank().getCustomer(userID);
     if (customer != null) {
       Account account = customer.getAccount(accountName);
@@ -66,7 +75,7 @@ public class LoanMarketplace {
     return false;
   }
 
-  public boolean transferLendingAccountToOtherAccount(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
+  public synchronized boolean transferLendingAccountToOtherAccount(String userID, String accountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
     Customer customer = NewBank.getBank().getCustomer(userID);
     if (customer != null) {
       Account account = customer.getAccount(accountName);
@@ -96,9 +105,9 @@ public class LoanMarketplace {
   }
 
   // If a customer borrows money, call this method to generate Loan object(s) according to the order of AvailableLoan object(s)
-  public boolean processLoanRequest(String borrowerUserID, String receivedAccountName, double amount) throws InvalidAccountException, InvalidAmountException {
+  public synchronized boolean processLoanRequest(String borrowerUserID, String receivedAccountName, double amount) throws InvalidAccountException, InvalidAmountException {
     Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
-    double totalAvailableAmount = getTotalAvailableLoanAmount();
+    double totalAvailableAmount = getTotalAvailableLoanAmount(borrowerUserID);
     if (borrower != null) {
       Account account = borrower.getAccount(receivedAccountName);
       if (account == null) throw new InvalidAccountException();
@@ -106,9 +115,10 @@ public class LoanMarketplace {
       double remaining = amount;
 
       // For the available loans lent by customers, first-in-first-lend
+      // The lender of an availableLoan cannot be the borrower of it
       for (int i = 0; i < availableLoans.size(); i++) {
         AvailableLoan firstAvailableLoan = availableLoans.get(i);
-        if (!firstAvailableLoan.isStillAvailable()) continue;
+        if (!firstAvailableLoan.isStillAvailable() || firstAvailableLoan.getLenderUserID().equals(borrowerUserID)) continue;
         if (remaining <= firstAvailableLoan.getAmount()) {
           firstAvailableLoan.lend(borrower.getUserID(), remaining);
           remaining = 0;
@@ -125,7 +135,7 @@ public class LoanMarketplace {
   }
 
   // After a borrower repay the loan, update the corresponding Loan objects and new AvailableLoan object(s) of the lender(s) is/are generated.
-  public boolean repayLoan(String borrowerUserID, String paidAccountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
+  public synchronized boolean repayLoan(String borrowerUserID, String paidAccountName, double amount) throws InvalidAccountException, InvalidAmountException, InsufficientBalanceException {
     Customer borrower = NewBank.getBank().getCustomer(borrowerUserID);
     if (borrower != null) {
       Account account = borrower.getAccount(paidAccountName);
