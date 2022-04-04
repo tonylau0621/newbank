@@ -67,6 +67,14 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @param request
+	 * @return Response
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException{
 		String toSend = "";
 		switch(request){
@@ -98,6 +106,14 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @param request
+	 * @return Response
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
 		String toSend = "";
 		switch(request){
@@ -118,6 +134,12 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @return CustomerID
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private CustomerID welcomePage() throws IOException, InterruptedException{
 		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
 		String input = in.readLine();

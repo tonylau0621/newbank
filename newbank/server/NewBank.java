@@ -1,7 +1,7 @@
 package newbank.server;
 
 // Only user for testing
-///mport java.util.ArrayList;
+// import java.util.ArrayList;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -9,6 +9,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+
+/**
+ * The NewBank class is the main class of the server.
+ * It contains all of the data structures and methods of the bank.
+ */
 
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
@@ -28,15 +33,33 @@ public class NewBank {
     addTestData();
 	}
 
+	// Not for final release
 	private void addTestData() {
 		Admin admin = new Admin("32462385", "adminPass", "", "", "", "", "");
 		admins.put("Admin", admin);
 	}
 
+	
+	/** 
+	 * Get this instance of the bank.
+	 * 
+	 * @return NewBank
+	 */
 	public static NewBank getBank() {
 		return bank;
 	}
 
+	
+	/** 
+	 * Checks the input login details against the database by communicating with the {@link UserService}.
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return CustomerID
+	 * @throws InvalidUserNameException
+	 * @throws InvalidPasswordException
+	 * @throws MaxLoginAttemptReachException
+	 */
 	public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException, MaxLoginAttemptReachException {
 		boolean isValidUserName = (customers.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
@@ -62,6 +85,17 @@ public class NewBank {
 		return targetCustomerId;
 	}
 
+	
+	/** 
+	 * Checks the input admin login details against the database by communicating with the {@link UserService}.
+	 * This method is due to be merged with the normal checkLogInDetails method.
+	 * 
+	 * @param userName
+	 * @param password
+	 * @return CustomerID
+	 * @throws InvalidUserNameException
+	 * @throws InvalidPasswordException
+	 */
 	public synchronized CustomerID adminLogin(String userName, String password) throws InvalidUserNameException, InvalidPasswordException {
 		boolean isValidUserName = (admins.containsKey(userName));
 		if(!isValidUserName) throw new InvalidUserNameException();
@@ -73,6 +107,19 @@ public class NewBank {
 	}
 
 
+	
+	/** 
+	 * Takes the user input and creates a request to be handled by the {@link UserService}.
+	 * 
+	 * @param customer
+	 * @param request
+	 * @return Response
+	 * @throws IOException
+	 * @throws InvalidAmountException
+	 * @throws InsufficientBalanceException
+	 * @throws InvalidAccountException
+	 * @throws InvalidUserNameException
+	 */
 	// commands from the NewBank customer are processed in this method
 	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
 		String[] requestTokens = request.split("\\s+");
@@ -119,6 +166,13 @@ public class NewBank {
 		}
 	}
 
+	
+	/** 
+	 * 
+	 * 
+	 * @param customer
+	 * @return String
+	 */
 	private String showMyAccounts(CustomerID customer) {
 		ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
 		String result = "";
@@ -128,6 +182,13 @@ public class NewBank {
 		return result;
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @param accountName
+	 * @return String
+	 * @throws IOException
+	 */
 	private String newAccount(CustomerID customer, String accountName) throws IOException {
 		ArrayList<Account> accounts = customers.get(customer.getKey()).getAccounts();
 		for (Account account : accounts){
@@ -143,6 +204,18 @@ public class NewBank {
 
 	}
 
+	
+	/** 
+	 * @param value
+	 * @param from
+	 * @param to
+	 * @param customer
+	 * @return String
+	 * @throws InvalidAmountException
+	 * @throws InsufficientBalanceException
+	 * @throws InvalidAccountException
+	 * @throws IOException
+	 */
 	private String moveAmount(String value, String from, String to, CustomerID customer) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException{
 		double amount;
 		try{
@@ -176,6 +249,15 @@ public class NewBank {
 		return value +  " has been moved from " + from + " to " + to;
 	}
 
+	
+	/** 
+	 * @param amount
+	 * @param payingCustomer
+	 * @param payingAccount
+	 * @param receivingCustomerKey
+	 * @param receivingAccount
+	 * @return String
+	 */
 	// PAY command
 	//Do I want to use Accounts or Customers?
 	// payAmount: Takes two accounts and an amount as input
@@ -211,13 +293,31 @@ public class NewBank {
 
 	}
 
+	
+	/** 
+	 * @param id
+	 * @return Customer
+	 */
 	public Customer getCustomer(CustomerID id){
 		return customers.get(id.getKey());
 	}
 
 	public HashMap<String,Customer> getCustomers() { return customers; }
 
-  public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
+  
+	/** 
+	 * @param username
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @param phone
+	 * @param email
+	 * @param address
+	 * @return Response
+	 * @throws InvalidUserNameException
+	 * @throws IOException
+	 */
+	public Response addCustomer(String username, String password, String firstName, String lastName, String phone, String email, String address) throws InvalidUserNameException, IOException {
         if (customers.keySet().contains(username)) {
             throw new InvalidUserNameException("Username already exists!");
         }
@@ -233,7 +333,12 @@ public class NewBank {
     }
 
     
-    // If all 99999999 userIDs are occupied, this method will perform infinite loop.
+    
+		/** 
+		 * @param customers
+		 * @return String
+		 */
+		// If all 99999999 userIDs are occupied, this method will perform infinite loop.
     // Can be changed to private for real use.
     public static String generateUserID(HashMap<String,Customer> customers) {
         Random ran = new Random();
@@ -254,6 +359,11 @@ public class NewBank {
         }
     }
 
+	
+	/** 
+	 * @param customer
+	 * @return String
+	 */
 	private String getTransactionRecord(CustomerID customer){
 		ArrayList<Transaction> transactionRecord = getLast10Transactions(customer);
 		String result;
@@ -269,6 +379,11 @@ public class NewBank {
 		return result;
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @return ArrayList<Transaction>
+	 */
 	private ArrayList<Transaction> getLast10Transactions(CustomerID customer){
 		//get UserID
 		String userID = customers.get(customer.getKey()).getUserID();
@@ -282,6 +397,11 @@ public class NewBank {
 		return result;
 	}
 
+	
+	/** 
+	 * @param transaction
+	 * @throws IOException
+	 */
 	private void addTransaction(Transaction transaction) throws IOException{
 		transactions.add(0, transaction);
 		DataHandler.updateTransactionCSV(this.transactions);

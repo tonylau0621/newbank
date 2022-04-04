@@ -10,6 +10,10 @@ public class Customer extends User{
 		accounts = new ArrayList<>();
 	}
 
+	
+	/** 
+	 * @return ArrayList<Account>
+	 */
 	public ArrayList<Account> getAccounts() {
 		// Deep copy
 		ArrayList<Account> accountsCopy = new ArrayList<>();
@@ -19,6 +23,10 @@ public class Customer extends User{
 		return accountsCopy;
 	}
 
+	
+	/** 
+	 * @return String
+	 */
 	public String accountsToString() {
 		String s = "";
 		for(Account a : accounts) {
@@ -27,10 +35,19 @@ public class Customer extends User{
 		return s;
 	}
 
+	
+	/** 
+	 * @param account
+	 */
 	public void addAccount(Account account) {
 		accounts.add(account);
 	}
 
+	
+	/** 
+	 * @param name
+	 * @return Account
+	 */
 	public Account getAccount(String name){
 		for (int i = 0; i < accounts.size(); i++){
 			if (accounts.get(i).getAccount().equals(name)){

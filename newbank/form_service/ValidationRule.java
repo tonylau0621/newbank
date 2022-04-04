@@ -19,6 +19,11 @@ public class ValidationRule {
         this.errorMessage = errorMessage;
     }
 
+    
+    /** 
+     * @param inputString
+     * @return boolean
+     */
     public boolean isValid(String inputString) {
         boolean result;
         if(this.regex != null && !this.regex.isEmpty()) result = inputString.matches(this.regex) == this.shouldMatch;

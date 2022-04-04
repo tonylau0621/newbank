@@ -1,8 +1,8 @@
 id, name, balance, customer_id
 30970859-1,Main,500.0
 30970859-2,Checking,0.0
-60023945-1,Main,950.0
-60023945-2,Checking,500.0
+60023945-1,Main,900.0
+60023945-2,Checking,550.0
 47971955-1,Main,0.0
 18392702-1,Main,1500.0
 18392702-2,Savings,1500.0

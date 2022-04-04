@@ -10,10 +10,18 @@ public class CustomerID {
 		this.isAdmin = isAdmin;
 	}
 
+	
+	/** 
+	 * @return String
+	 */
 	public String getKey() {
 		return key;
 	}
 
+	
+	/** 
+	 * @return boolean
+	 */
 	public boolean isAdmin() {
 		return isAdmin;
 	}

@@ -8,6 +8,11 @@ import java.util.List;
 abstract class Input {
     public abstract List<ValidationRule> getValidationRules();
     public abstract String getUserInteractionMessage();
+    
+    /** 
+     * @return String
+     * @throws IOException
+     */
     public String getInput() throws IOException {
         String result;
         do {
@@ -17,6 +22,11 @@ abstract class Input {
         return result;
     }
 
+    
+    /** 
+     * @param inputString
+     * @return boolean
+     */
     public boolean isInputValid(String inputString) {
         if(inputString == null || inputString.isEmpty()) return false;
         boolean result = true;

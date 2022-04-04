@@ -29,6 +29,11 @@ public class NewBankTest {
     customersID = TestingData.customersID;
   }
 
+  
+  /** 
+   * @param username
+   * @param password
+   */
   // Tests for login
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCorrectUsernameAndPassword")
@@ -41,6 +46,11 @@ public class NewBankTest {
     }
   }
 
+  
+  /** 
+   * @param username
+   * @param password
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideWrongUsernameAndPassword")
   public void logInWithWrongUsernameAndPassword(String username, String password) {
@@ -51,6 +61,11 @@ public class NewBankTest {
     }
     fail("Logged in with wrong username and/or password");
   }
+  
+  /** 
+   * @param customerID
+   * @param command
+   */
   // End of Tests for login
 
 
@@ -76,6 +91,11 @@ public class NewBankTest {
     fail(customer.getFirstName() + "'s " + accountType + " account not found/not probably set.");
   }
 
+  
+  /** 
+   * @param customerID
+   * @param command
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidNewAccountCommand")
   public void invalidNewAccountCommand(CustomerID customerID, String command) {
@@ -109,6 +129,11 @@ public class NewBankTest {
       Assertions.assertEquals(accountsBeforeCommand.get(i).getAmount(), accountsAfterCommand.get(i).getAmount());
     }
   }
+  
+  /** 
+   * @param customerID
+   * @param command
+   */
   // End of tests for NEWACCOUNT
 
 
@@ -189,6 +214,11 @@ public class NewBankTest {
     Assertions.assertEquals(account2OldBalance, account2.getAmount());
 
   }
+  
+  /** 
+   * @param customerID
+   * @param command
+   */
   // End of tests for MOVE
 
 

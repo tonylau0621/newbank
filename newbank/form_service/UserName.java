@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserName extends Input {
+    
+    /** 
+     * @return List<ValidationRule>
+     */
     @Override
     public List<ValidationRule> getValidationRules() {
         List<ValidationRule> rules = new ArrayList<>();
@@ -12,6 +16,10 @@ public class UserName extends Input {
         return rules;
     }
 
+    
+    /** 
+     * @return String
+     */
     @Override
     public String getUserInteractionMessage() {
         return "Enter Username";

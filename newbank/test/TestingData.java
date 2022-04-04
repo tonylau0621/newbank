@@ -26,6 +26,10 @@ public class TestingData {
     //customersID = bank.customersID;
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   // Testing data
 
   // Data for login
@@ -37,6 +41,10 @@ public class TestingData {
     );
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideWrongUsernameAndPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyABC"),
@@ -50,6 +58,10 @@ public class TestingData {
     );
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideUsernameAndCorrectOldPasswordAndNewPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyPass", "12345"),
@@ -58,6 +70,10 @@ public class TestingData {
     );
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideUsernameAndWrongOldPasswordAndNewPassword() {
     return Stream.of(
             Arguments.of("Bhagy", "bhagyPass1", "12345"),
@@ -65,6 +81,10 @@ public class TestingData {
             Arguments.of("John", "JohnPass", "newPassJohn")
     );
   }
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   // End of data for login
 
   // Data for NEWACCOUNT
@@ -79,6 +99,10 @@ public class TestingData {
     return stream;
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideCustomerIDAndInvalidNewAccountCommand() {
     String[] commands = {"NEWACCOUNT", "ACCOUNTNEW Current", "Investment NEWACCOUNT"};
     Stream<Arguments> stream = Stream.of();
@@ -89,6 +113,10 @@ public class TestingData {
     }
     return stream;
   }
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   // End of data for NEWACCOUNT
 
   // Data for MOVE
@@ -104,6 +132,10 @@ public class TestingData {
     return stream;
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideCustomerIDAndInvalidMoveCommand() {
     String[] commands = {"MOVE 100 TestingAccount1", "MOVE 3ab Main Savings", "14.9 Investment Current", "MOVE Investment Current 170",
             "MOVE 300 NotExistsAccount1 Main", "MOVE 50 NotExistsAccount1 NotExistsAccount2"};
@@ -116,6 +148,10 @@ public class TestingData {
     return stream;
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   // Assume customer has the corresponding accounts.
   public static Stream<Arguments> provideCustomerIDAndInvalidMoveCommandWithInvalidAmount() {
     String[] commands = {"MOVE -100 TestingAccount1 TestingAccount2", "MOVE -26.9 Main Savings", "MOVE 0 Investment Current"};
@@ -127,6 +163,10 @@ public class TestingData {
     }
     return stream;
   }
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   //End of data for MOVE
 
   // Data for PAY
@@ -143,6 +183,10 @@ public class TestingData {
     return stream;
   }
 
+  
+  /** 
+   * @return Stream<Arguments>
+   */
   public static Stream<Arguments> provideCustomerIDAndInvalidPayCommand() {
     String[] commands = {"PAY John 9999999 Main Checking", "PAY 9999999 Main Bhagy Main", "PAY Christina -150", "PAY Bhagy 0", "PAY Peter 11.6", "PAY Christina -53.9", "PAY -100 Main John Checking"};
     Stream<Arguments> stream = Stream.of();

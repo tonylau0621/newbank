@@ -29,12 +29,22 @@ public class CustomerTest {
     customersID = TestingData.customersID;
   }
 
+  
+  /** 
+   * @param username
+   * @param password
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCorrectUsernameAndPassword")
   public void testCustomerIDCheckPasswordMethodWithCorrectPassword(String username, String password) {
     Assertions.assertTrue(customers.get(username).checkPassword(password));
   }
 
+  
+  /** 
+   * @param username
+   * @param password
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideWrongUsernameAndPassword")
   public void testCustomerIDCheckPasswordMethodWithWrongPassword(String username, String password) {
@@ -43,6 +53,12 @@ public class CustomerTest {
     }
   }
 
+  
+  /** 
+   * @param username
+   * @param oldPassword
+   * @param newPassword
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideUsernameAndCorrectOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithCorrectOldPassword(String username, String oldPassword, String newPassword) {
@@ -50,6 +66,12 @@ public class CustomerTest {
     Assertions.assertTrue(customers.get(username).checkPassword(newPassword));
   }
 
+  
+  /** 
+   * @param username
+   * @param oldPassword
+   * @param newPassword
+   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideUsernameAndWrongOldPasswordAndNewPassword")
   public void testCustomerIDsetPasswordMethodWithWrongOldPassword(String username, String oldPassword, String newPassword) {

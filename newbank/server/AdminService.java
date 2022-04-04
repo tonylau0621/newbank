@@ -3,6 +3,12 @@ package newbank.server;
 import java.io.IOException;
 
 public class AdminService {
+  
+  /** 
+   * @return CustomerID
+   * @throws IOException
+   * @throws InterruptedException
+   */
   public static CustomerID login() throws IOException, InterruptedException {
     CommunicationService.sendOut("Enter Username");
     String userName = CommunicationService.readIn();
