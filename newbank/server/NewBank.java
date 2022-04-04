@@ -180,12 +180,17 @@ public class NewBank {
 	//Do I want to use Accounts or Customers?
 	// payAmount: Takes two accounts and an amount as input
 	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-							 String receivingCustomerKey, String receivingAccount) {
+							 String receivingCustomerKey, String receivingAccount) throws IOException {
 		//Account does not exist
 		Customer payer = customers.get(payingCustomer.getKey());
-		Customer receiver = customers.get(receivingCustomerKey);
-
-		if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
+		Customer receiver = null;
+		for (HashMap.Entry<String, Customer> entry : customers.entrySet()){
+			if (entry.getValue().getUserID().equals(receivingCustomerKey)){
+				receiver = customers.get(entry.getKey());
+			}
+		}
+	
+		if (receiver == null || payer.getAccount(payingAccount) == null || receiver.getAccountbyID(receivingAccount) == null) {
 			return "Please check Accounts";
 
 		}
@@ -198,8 +203,9 @@ public class NewBank {
 		if(balance >= amount) {
 			//Adjust balance for both accounts
 			payer.getAccount(payingAccount).updateBalance(-amount);
-			receiver.getAccount(receivingAccount).updateBalance(amount);
-
+			receiver.getAccountbyID(receivingAccount).updateBalance(amount);
+			DataHandler.updateAccountCSV(customers);
+			addTransaction(new Transaction(payer.getAccount(payingAccount).getID(), receivingAccount, amount, "Payment "));
 			//updated_balance = payer.getAccount(payingAccount).getAmount();
 
 			//return "Payment was successful.";
