@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-
+/**
+ * Handles data flow between the bank server and the database.
+ * Reads and writes from the database files.
+ */
 public class DataHandler {
     private static String accCsv= "newbank/server/data/Account.txt";
     private static String cusCsv= "newbank/server/data/Customer.txt";
@@ -31,7 +34,7 @@ public class DataHandler {
     /** 
      * @return ArrayList<Transaction>
      */
-    public static ArrayList<Transaction> readTransation(){
+    public static ArrayList<Transaction> readTransaction(){
         ArrayList<Transaction> transactions = new ArrayList<>();
         String[] line;
         File tranFile = new File(tranCsv);

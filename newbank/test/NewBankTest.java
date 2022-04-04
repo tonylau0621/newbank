@@ -29,11 +29,6 @@ public class NewBankTest {
     customersID = TestingData.customersID;
   }
 
-  
-  /** 
-   * @param username
-   * @param password
-   */
   // Tests for login
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCorrectUsernameAndPassword")
@@ -46,11 +41,6 @@ public class NewBankTest {
     }
   }
 
-  
-  /** 
-   * @param username
-   * @param password
-   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideWrongUsernameAndPassword")
   public void logInWithWrongUsernameAndPassword(String username, String password) {
@@ -62,10 +52,6 @@ public class NewBankTest {
     fail("Logged in with wrong username and/or password");
   }
   
-  /** 
-   * @param customerID
-   * @param command
-   */
   // End of Tests for login
 
 
@@ -92,10 +78,6 @@ public class NewBankTest {
   }
 
   
-  /** 
-   * @param customerID
-   * @param command
-   */
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidNewAccountCommand")
   public void invalidNewAccountCommand(CustomerID customerID, String command) {
@@ -215,10 +197,6 @@ public class NewBankTest {
 
   }
   
-  /** 
-   * @param customerID
-   * @param command
-   */
   // End of tests for MOVE
 
 

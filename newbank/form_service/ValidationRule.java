@@ -1,5 +1,10 @@
 package newbank.form_service;
 
+/**
+ * Defines a validation rule for an input field.
+ * Includes a method for checking if the input matches the validation rule, using regex.
+ * 
+ */
 public class ValidationRule {
     private String regex;
     private String errorMessage;

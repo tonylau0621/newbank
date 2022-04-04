@@ -5,6 +5,11 @@ import newbank.server.CommunicationService;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Abstract class for all input fields.
+ * Holds the default validation rules and the message to be displayed to the user, to be overridden by subclasses.
+ * 
+ */
 abstract class Input {
     public abstract List<ValidationRule> getValidationRules();
     public abstract String getUserInteractionMessage();

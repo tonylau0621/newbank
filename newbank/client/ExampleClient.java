@@ -7,6 +7,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * Class handling client connections to the bank server.
+ * This is a runnable class that connects to the server and sends commands to it.
+ * 
+ */
+
 public class ExampleClient extends Thread{
 
 	private Socket server;
@@ -59,6 +65,8 @@ public class ExampleClient extends Thread{
 
 	
 	/** 
+	 * Connects to the server when instantiated.
+	 * 
 	 * @param args
 	 * @throws UnknownHostException
 	 * @throws IOException
@@ -70,6 +78,8 @@ public class ExampleClient extends Thread{
 
 	
 	/** 
+	 * Clears the terminal screen.
+	 * 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */

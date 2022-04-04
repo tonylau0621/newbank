@@ -10,12 +10,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Contains the functionality of all the user operations within the bank.
+ * See the individual methods for more details.
+ */
 public class UserService {
     public static final Integer MAX_LOGIN_ATTEMPT = 3;
     public static Map<String, Integer> userMapByLoginAttempt = new HashMap<>();
     
     /** 
+     * Asks for the client's login details, and attempts to log in with a new CustomerID.
+     * 
      * @return CustomerID
      * @throws IOException
      * @throws InterruptedException
@@ -42,6 +47,8 @@ public class UserService {
 
     
     /** 
+     * Shows the accounts held by a customer.
+     * 
      * @param customerID
      * @return ArrayList<Account>
      */
@@ -56,6 +63,8 @@ public class UserService {
 
     
     /** 
+     * Moves money between two accounts held by one customer.
+     * 
      * @param customerID
      * @return Response
      * @throws IOException
@@ -91,6 +100,8 @@ public class UserService {
 
     
     /** 
+     * Pays money from the current customer's account, to a chosen account held by another customer.
+     * 
      * @param customerID
      * @return Response
      * @throws IOException
@@ -123,6 +134,8 @@ public class UserService {
 
     
     /** 
+     * Creates a new empty account for the customer, with a custom name.
+     * 
      * @param customerID
      * @return Response
      * @throws IOException
@@ -151,6 +164,8 @@ public class UserService {
 
     
     /** 
+     * Unlocks a user that has been locked out of the system for too many failed login attempts.
+     * 
      * @return String
      * @throws IOException
      * @throws InvalidUserNameException
@@ -166,6 +181,9 @@ public class UserService {
 
     
     /** 
+     * Adds a new customer to the system.
+     * Creates a unique customer ID and adds the customer to the bank.
+     * 
      * @return Response
      * @throws IOException
      * @throws InterruptedException

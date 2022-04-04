@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Runnable class that instantiates the bank class and accepts incoming connections from clients.
+ * Should be run before any other threads are created.
+ * 
+ * Prints a console log of requests from each client.
+ */
 public class NewBankServer extends Thread{
 	
 	private ServerSocket server;

@@ -6,6 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Communication handler between the server and the client.
+ * This class takes commands from the client and sends them to the server.
+ */
 public class CommunicationService {
     private static PrintWriter out;
     private static BufferedReader in;

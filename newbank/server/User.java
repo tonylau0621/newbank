@@ -1,5 +1,9 @@
 package newbank.server;
 
+/**
+ * Abstract class representing a user of the bank.
+ * Contains the user's details with both getters and setters.
+ */
 public class User {
   private String userID;
 	private String password;
@@ -21,6 +25,8 @@ public class User {
 
   
 	/** 
+	 * Password check method to prevent data leaks.
+	 * 
 	 * @param password
 	 * @return boolean
 	 */
@@ -30,6 +36,8 @@ public class User {
 
 	
 	/** 
+	 * Password setter that requires the user to enter their old password before changing it, and returns whether it was changed successfully.
+	 * 
 	 * @param oldPassword
 	 * @param newPassword
 	 * @return boolean

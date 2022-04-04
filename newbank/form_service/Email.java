@@ -3,6 +3,10 @@ package newbank.form_service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contains the validation rules and interaction message for the email input field.
+ * 
+ */
 public class Email extends Input {
     
     /** 

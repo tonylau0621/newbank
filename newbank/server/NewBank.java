@@ -14,7 +14,6 @@ import java.util.Random;
  * The NewBank class is the main class of the server.
  * It contains all of the data structures and methods of the bank.
  */
-
 // Please comment out all "Only use for testing" method/block/statement for real use.
 public class NewBank {
 
@@ -28,7 +27,7 @@ public class NewBank {
 
 	private NewBank() {
 		customers = DataHandler.readCustData();
-		transactions = DataHandler.readTransation();
+		transactions = DataHandler.readTransaction();
     admins = new HashMap<>();
     addTestData();
 	}

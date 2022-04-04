@@ -2,6 +2,10 @@ package newbank.server;
 
 import java.time.Instant;
 
+/**
+ * Represents a transaction to be processed by the bank.
+ * The transaction is then able to be logged to the database.
+ */
 public class Transaction implements Comparable<Transaction>{
     private String id;
     private Instant dateAndTime;

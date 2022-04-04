@@ -6,6 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Communication handler instantiated on each client connection.
+ * Sends and receives messages from the client and server.
+ */
 public class NewBankClientHandler extends Thread {
 	
 	private NewBank bank;

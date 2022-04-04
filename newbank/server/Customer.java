@@ -2,6 +2,11 @@ package newbank.server;
 
 import java.util.ArrayList;
 
+/**
+ * Class defining a customer account, with customer specific methods.
+ * The included methods relate to bank account management.
+ * 
+ */
 public class Customer extends User{
 	private ArrayList<Account> accounts;
 
