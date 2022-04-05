@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class LoanMarketplace {
 
@@ -131,23 +132,41 @@ public class LoanMarketplace {
 
       // For the available loans lent by customers, first-in-first-lend
       // The lender of an availableLoan cannot be the borrower of it
+      // lendersMap integrates the available loans so that if there are more than one available loans with the same lender,
+      // lendersMap can combine them in transaction.
+      HashMap<String, Double> lendersMap = new HashMap<>();
       for (int i = 0; i < availableLoans.size(); i++) {
         AvailableLoan firstAvailableLoan = availableLoans.get(i);
         if (!firstAvailableLoan.isStillAvailable() || firstAvailableLoan.getLenderUserID().equals(borrowerUserID)) continue;
         if (remaining <= firstAvailableLoan.getAmount()) {
           firstAvailableLoan.lend(borrower.getUserID(), remaining);
-          // Update the lender's transaction (and database)
-          bank.addTransaction(new Transaction(firstAvailableLoan.getLenderUserID()+"-a", "99999999-1", remaining, "Lending"));
+
+          if (lendersMap.keySet().contains(firstAvailableLoan.getLenderUserID())) {
+            lendersMap.put(firstAvailableLoan.getLenderUserID(), lendersMap.get(firstAvailableLoan.getLenderUserID()) + remaining);
+          } else {
+            lendersMap.put(firstAvailableLoan.getLenderUserID(), remaining);
+          }
+
           remaining = 0;
           break;
         } else { // for the first AvailableLoan object cannot fulfil the (remaining) loan amount
           remaining -= firstAvailableLoan.getAmount();
-          // Update the lender's transaction (and database)
-          bank.addTransaction(new Transaction(firstAvailableLoan.getLenderUserID()+"-a", "99999999-1", firstAvailableLoan.getAmount(), "Lending"));
+
+          if (lendersMap.keySet().contains(firstAvailableLoan.getLenderUserID())) {
+            lendersMap.put(firstAvailableLoan.getLenderUserID(), lendersMap.get(firstAvailableLoan.getLenderUserID()) + firstAvailableLoan.getAmount());
+          } else {
+            lendersMap.put(firstAvailableLoan.getLenderUserID(), firstAvailableLoan.getAmount());
+          }
+
           firstAvailableLoan.lend(borrower.getUserID(), firstAvailableLoan.getAmount());
         }
       }
       account.updateBalance(amount);
+
+      // Update the lender's transaction (and database)
+      for (Map.Entry<String, Double> entry : lendersMap.entrySet()) {
+        bank.addTransaction(new Transaction(entry.getKey()+"-a", "99999999-1", entry.getValue(), "Lending"));
+      }
 
       // Update the borrower's transaction (and database)
       bank.addTransaction(new Transaction("99999999-1", account.getID(), amount, "Borrowing"));
@@ -174,20 +193,38 @@ public class LoanMarketplace {
 
       ArrayList<Loan> borrowedLoans = borrower.getBorrowedLoans();
       double remaining = amount;
+      // lendersMap integrates the loans so that if there are more than one loans with the same lender,
+      // lendersMap can combine them in transaction.
+      HashMap<String, Double> lendersMap = new HashMap<>();
       for (int i = 0; i < borrowedLoans.size(); i++) {
         Loan firstBorrowedLoans = borrowedLoans.get(i);
         if (remaining > firstBorrowedLoans.getRemainingAmount()) {
           remaining -= firstBorrowedLoans.getRemainingAmount();
+
+          if (lendersMap.keySet().contains(firstBorrowedLoans.getLenderUserID())) {
+            lendersMap.put(firstBorrowedLoans.getLenderUserID(), lendersMap.get(firstBorrowedLoans.getLenderUserID()) + firstBorrowedLoans.getRemainingAmount());
+          } else {
+            lendersMap.put(firstBorrowedLoans.getLenderUserID(), firstBorrowedLoans.getRemainingAmount());
+          }
+
           firstBorrowedLoans.repayLoan(borrower, paidAccountName, firstBorrowedLoans.getRemainingAmount());
-          // Update the lender's transaction (and database)
-          bank.addTransaction(new Transaction("99999999-1", firstBorrowedLoans.getLenderUserID()+"-a", firstBorrowedLoans.getRemainingAmount(), "Debt Collection"));
         } else {
           firstBorrowedLoans.repayLoan(borrower, paidAccountName, remaining);
-          // Update the lender's transaction (and database)
-          bank.addTransaction(new Transaction("99999999-1", firstBorrowedLoans.getLenderUserID()+"-a", remaining, "Debt Collection"));
+
+          if (lendersMap.keySet().contains(firstBorrowedLoans.getLenderUserID())) {
+            lendersMap.put(firstBorrowedLoans.getLenderUserID(), lendersMap.get(firstBorrowedLoans.getLenderUserID()) + remaining);
+          } else {
+            lendersMap.put(firstBorrowedLoans.getLenderUserID(), remaining);
+          }
+
           remaining = 0;
           break;
         }
+      }
+
+      // Update the lender's transaction (and database)
+      for (Map.Entry<String, Double> entry : lendersMap.entrySet()) {
+        bank.addTransaction(new Transaction("99999999-1", entry.getKey()+"-a", entry.getValue(), "Debt Collection"));
       }
 
       // Update the borrower's transaction (and database)
