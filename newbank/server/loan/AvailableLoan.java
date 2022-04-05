@@ -17,6 +17,12 @@ public class AvailableLoan implements Comparable<AvailableLoan> {
     this.amount = amount;
     stillAvailable = true;
   }
+  public AvailableLoan(long availableLoanID, String lenderUserID, double amount, boolean stillAvailable) {
+      this.availableLoanID = availableLoanID;
+      this.lenderUserID = lenderUserID;
+      this.amount = amount;
+      this.stillAvailable = stillAvailable;
+  }
 
   public void getTotalNumberOfAvailableLoanFromDatabase() {
     maxAvailableLoanID = 0; // should be got from database
@@ -38,7 +44,11 @@ public class AvailableLoan implements Comparable<AvailableLoan> {
     return stillAvailable;
   }
 
-  public Loan lend(String borrowerUserID, double loanAmount) {
+  public static void setMaxAvailableLoanID(long maxAvailableLoanID) {
+    AvailableLoan.maxAvailableLoanID = maxAvailableLoanID;
+  }
+
+  public boolean lend(String borrowerUserID, double loanAmount) {
     if (NewBank.getBank().getCustomer(borrowerUserID) != null && loanAmount > 0 && amount >= loanAmount) {
       amount -= loanAmount;
       if (amount <= 0) {
@@ -46,9 +56,9 @@ public class AvailableLoan implements Comparable<AvailableLoan> {
       }
       Loan loan = new Loan(lenderUserID, borrowerUserID, loanAmount * (1 + LoanMarketplace.getInterestPerLoan()));
       NewBank.getLoanMarketplace().addLoan(loan);
-      return loan;
+      return true;
     }
-    return null;
+    return false;
   }
 
   public boolean transferToAccount(Customer customer, String accountName, double transferAmount) {

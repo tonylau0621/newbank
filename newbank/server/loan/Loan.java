@@ -22,6 +22,15 @@ public class Loan implements Comparable<Loan> {
     allRepaid = false;
   }
 
+  public Loan(long loanID, String lenderUserID, String borrowerUserID, double loanAmount, double remainingAmount, boolean allRepaid) {
+    this.loanID = loanID;
+    this.lenderUserID = lenderUserID;
+    this.borrowerUserID = borrowerUserID;
+    this.loanAmount = loanAmount;
+    this.remainingAmount = remainingAmount;
+    this.allRepaid = allRepaid;
+  }
+
   public void getTotalNumberOfLoanFromDatabase() {
     maxLoanID = 0; // should be got from database
   }
@@ -48,6 +57,10 @@ public class Loan implements Comparable<Loan> {
 
   public boolean isAllRepaid() {
     return allRepaid;
+  }
+
+  public static void setMaxLoanID(long maxLoanID) {
+    Loan.maxLoanID = maxLoanID;
   }
 
   // After the borrower repay the loan, update the loan fields and the repaid amount will become a new AvailableLoan object of the lender.

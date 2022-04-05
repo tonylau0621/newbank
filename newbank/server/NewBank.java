@@ -3,6 +3,8 @@ package newbank.server;
 // Only user for testing
 //import java.util.ArrayList;
 
+import newbank.server.loan.AvailableLoan;
+import newbank.server.loan.Loan;
 import newbank.server.loan.LoanMarketplace;
 
 import java.io.IOException;
@@ -26,7 +28,7 @@ public class NewBank {
 
 	private NewBank() {
 		customers = DataHandler.readCustData();
-		transactions = DataHandler.readTransation();
+		transactions = DataHandler.readTransaction();
     admins = new HashMap<>();
     loanMarketplace = new LoanMarketplace();
     addTestData();
@@ -39,15 +41,20 @@ public class NewBank {
 
   public void addLoanData() {
     // Loan
-    try {
-      loanMarketplace.offerLoan("00243584", "Main", 800.0);
-      loanMarketplace.offerLoan("00243584", "Savings", 950.0);
-      loanMarketplace.offerLoan("00243584", "Investment", 400.0);
-      loanMarketplace.offerLoan("18392702", "Main", 987.0);
-      loanMarketplace.offerLoan("18392702", "Savings", 1275.0);
-      //loanMarketplace.processLoanRequest("60023945", "Checking", 700.0);
-    } catch (Exception e) {
+    ArrayList<AvailableLoan> availableLoansFromDatabase = DataHandler.readAvailableLoan();
+    ArrayList<Loan> loansFromDatabase = DataHandler.readLoan();
+    long maxAvailableLoanID = 0;
+    long maxLoanID = 0;
+    for (AvailableLoan availableLoan : availableLoansFromDatabase) {
+      loanMarketplace.addAvailableLoan(availableLoan);
+      maxAvailableLoanID = Math.max(maxAvailableLoanID, availableLoan.getAvailableLoanID());
     }
+    AvailableLoan.setMaxAvailableLoanID(maxAvailableLoanID);
+    for (Loan loan : loansFromDatabase) {
+      loanMarketplace.addLoan(loan);
+      maxLoanID = Math.max(maxLoanID, loan.getLoanID());
+    }
+    Loan.setMaxLoanID(maxLoanID);
   }
 
   public static NewBank getBank() {
@@ -340,13 +347,13 @@ public class NewBank {
     return result;
   }
 
-  private void addTransaction(Transaction transaction) throws IOException{
+  public void addTransaction(Transaction transaction) throws IOException{
     transactions.add(0, transaction);
     DataHandler.updateTransactionCSV(this.transactions);
   }
 
   // for micro-loan
-  private String offerLoan(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+  private String offerLoan(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException {
     Customer lender = customers.get(customer.getKey());
     if (loanMarketplace.offerLoan(lender.getUserID(), accountName, amount)) {
       return "You have moved " + amount + " to the lending account.";
@@ -354,7 +361,7 @@ public class NewBank {
     return "Failed to move " + amount + " to the lending account.";
   }
 
-  private String takeBack(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+  private String takeBack(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException {
     Customer lender = customers.get(customer.getKey());
     if (loanMarketplace.transferLendingAccountToOtherAccount(lender.getUserID(), accountName, amount)) {
       return "You have moved " + amount + " from the lending account to " + accountName;
@@ -362,7 +369,7 @@ public class NewBank {
     return "Failed to move " + amount + " from the lending account to " + accountName;
   }
 
-  private String borrow(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InvalidAccountException {
+  private String borrow(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InvalidAccountException, IOException {
     Customer borrower = customers.get(customer.getKey());
 
     double borrowLimit = Math.min(borrower.getRemainingLoanLimit(), loanMarketplace.getTotalAvailableLoanAmount());
@@ -374,7 +381,7 @@ public class NewBank {
     return "Failed to borrow " + amount;
   }
 
-  private String repay(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException {
+  private String repay(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException {
     Customer borrower = customers.get(customer.getKey());
     double realAmount = amount < borrower.getTotalRemainingDebt() ? amount : borrower.getTotalRemainingDebt();
     if (loanMarketplace.repayLoan(borrower.getUserID(), accountName, amount)) {
