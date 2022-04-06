@@ -104,10 +104,6 @@ public class TestingData {
     return stream;
   }
 
-  
-  /** 
-   * @return Stream<Arguments>
-   */
   public static Stream<Arguments> provideCustomerIDAndInvalidMoveCommand() {
     String[] commands = {"MOVE 100 TestingAccount1", "MOVE 3ab Main Savings", "14.9 Investment Current", "MOVE Investment Current 170",
             "MOVE 300 NotExistsAccount1 Main", "MOVE 50 NotExistsAccount1 NotExistsAccount2"};

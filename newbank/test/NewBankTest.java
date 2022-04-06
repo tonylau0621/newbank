@@ -111,11 +111,6 @@ public class NewBankTest {
       Assertions.assertEquals(accountsBeforeCommand.get(i).getAmount(), accountsAfterCommand.get(i).getAmount());
     }
   }
-  
-  /** 
-   * @param customerID
-   * @param command
-   */
   // End of tests for NEWACCOUNT
 
 
