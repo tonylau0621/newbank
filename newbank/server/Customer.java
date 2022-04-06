@@ -39,4 +39,14 @@ public class Customer extends User{
 		}
 		return null;
 	}
+
+	public Account getAccountbyID(String id){
+		for (int i = 0; i < accounts.size(); i++){
+			if (accounts.get(i).getID().equals(id)){
+				return accounts.get(i);
+			}
+		}
+		return null;
+	}
+
 }
