@@ -1,5 +1,10 @@
 package newbank.form_service;
 
+/**
+ * Defines a validation rule for an input field.
+ * Includes a method for checking if the input matches the validation rule, using regex.
+ * 
+ */
 public class ValidationRule {
     private String regex;
     private String errorMessage;
@@ -19,6 +24,11 @@ public class ValidationRule {
         this.errorMessage = errorMessage;
     }
 
+    
+    /** 
+     * @param inputString
+     * @return boolean
+     */
     public boolean isValid(String inputString) {
         boolean result;
         if(this.regex != null && !this.regex.isEmpty()) result = inputString.matches(this.regex) == this.shouldMatch;

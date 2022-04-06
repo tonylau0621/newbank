@@ -1,5 +1,8 @@
 package newbank.form_service;
 
+/** 
+ * Contains all public constants used by other classes.
+ */
 public class Constant {
     public static final int DEFAULT_MIN_LENGTH = 6;
     public static final int DEFAULT_MAX_LENGTH = 10;

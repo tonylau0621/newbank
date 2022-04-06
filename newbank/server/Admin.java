@@ -1,9 +1,9 @@
 package newbank.server;
 
-// class defining an Admin account
-// This is almost identical to the customer class, minus the accounts field and possibly plus a field to set the admin clearance level
-// Therefore in future, inheritance could be used to simplify this class and reduce redundancy 
-
+/**
+ * Class defining an Admin account and containing admin-specific methods.
+ * @see User
+ */
 public class Admin extends User {
   // private String privaleges; // add different levels of admin clearance, e.g. "admin", "superadmin", "owner"
 
