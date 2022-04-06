@@ -38,7 +38,7 @@ public class UserService {
     private static ArrayList<Account> showAccounts(CustomerID customerID){
         ArrayList<Account> accounts = NewBank.getBank().getCustomer(customerID).getAccounts();
         for (int i=0; i< accounts.size(); i++){
-            CommunicationService.sendOut(String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount());
+            CommunicationService.sendOut(String.valueOf(i+1)+") "+ accounts.get(i).getID() + " " + accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount());
         }
         return accounts;
     }
