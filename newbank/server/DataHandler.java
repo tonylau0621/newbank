@@ -1,5 +1,8 @@
 package newbank.server;
 
+import newbank.server.loan.AvailableLoan;
+import newbank.server.loan.Loan;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +20,8 @@ public class DataHandler {
     private static String accCsv= "newbank/server/data/Account.txt";
     private static String cusCsv= "newbank/server/data/Customer.txt";
     private static String tranCsv= "newbank/server/data/Transaction.txt";
+    private static String availLoanCsv = "newbank/server/data/AvailableLoan.txt";
+    private static String loanCsv = "newbank/server/data/Loan.txt";
     private static String separator="#se2#"; //for handling the case that the data include comma
 
     
@@ -119,7 +124,47 @@ public class DataHandler {
         }
     }
 
-    
+
+    public static ArrayList<AvailableLoan> readAvailableLoan() {
+        ArrayList<AvailableLoan> availableLoans = new ArrayList<>();
+        String[] line;
+        File availLoanFile = new File(availLoanCsv);
+        try (Scanner scanner = new Scanner(availLoanFile)){
+            //skip header
+            line = scanner.nextLine().split(",");
+            //read linebyline and put to hashmap
+            while(scanner.hasNextLine()){
+                line = scanner.nextLine().split(",", -1);
+                getComma(line);
+                AvailableLoan availableLoan = new AvailableLoan(Long.parseLong(line[0]),line[1],Double.parseDouble(line[2]), line[3].equals("true"));
+                availableLoans.add(availableLoan);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return availableLoans;
+    }
+
+    public static ArrayList<Loan> readLoan() {
+        ArrayList<Loan> loans = new ArrayList<>();
+        String[] line;
+        File loanFile = new File(loanCsv);
+        try (Scanner scanner = new Scanner(loanFile)){
+            //skip header
+            line = scanner.nextLine().split(",");
+            //read linebyline and put to hashmap
+            while(scanner.hasNextLine()){
+                line = scanner.nextLine().split(",", -1);
+                getComma(line);
+                Loan loan = new Loan(Long.parseLong(line[0]), line[1], line[2], Double.parseDouble(line[3]), Double.parseDouble(line[4]), line[5].equals("true"));
+                loans.add(loan);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return loans;
+    }
+
     /** 
      * @param customers
      * @throws IOException
@@ -206,4 +251,49 @@ public class DataHandler {
         writer.close();
       }
     }
+
+    public static void updateAvailableLoanCSV(ArrayList<AvailableLoan> availableLoans) throws IOException {
+        // write back staff data
+        File file = new File(availLoanCsv);
+        // creates the file
+        file.createNewFile();
+        // creates a FileWriter Object
+        try (FileWriter writer = new FileWriter(file)){
+            // Writes the content to the file
+            String header = "id, lender_id, amount, still_available\n";
+            writer.write(header);
+            for (AvailableLoan availableLoan : availableLoans) {
+                writer.write(String.valueOf(availableLoan.getAvailableLoanID()).replace(",",separator)+","+
+                        availableLoan.getLenderUserID().replace(",",separator)+","+
+                        String.valueOf(availableLoan.getAmount()).replace(",",separator)+","+
+                        String.valueOf(availableLoan.isStillAvailable()).replace(",",separator)+"\n");
+            }
+            writer.flush();
+            writer.close();
+        }
+    }
+
+    public static void updateLoanCSV(ArrayList<Loan> loans) throws IOException {
+        // write back staff data
+        File file = new File(loanCsv);
+        // creates the file
+        file.createNewFile();
+        // creates a FileWriter Object
+        try (FileWriter writer = new FileWriter(file)){
+            // Writes the content to the file
+            String header = "id, lender_id, borrower_id, loan_amount, remaining_amount, all_repaid\n";
+            writer.write(header);
+            for (Loan loan : loans) {
+                writer.write(String.valueOf(loan.getLoanID()).replace(",",separator)+","+
+                        loan.getLenderUserID().replace(",",separator)+","+
+                        loan.getBorrowerUserID().replace(",",separator)+","+
+                        String.valueOf(loan.getLoanAmount()).replace(",",separator)+","+
+                        String.valueOf(loan.getRemainingAmount()).replace(",",separator)+","+
+                        String.valueOf(loan.isAllRepaid()).replace(",",separator)+"\n");
+            }
+            writer.flush();
+            writer.close();
+        }
+    }
+
 }
