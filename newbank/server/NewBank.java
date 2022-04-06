@@ -244,9 +244,66 @@ public class NewBank {
     if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
       return "Please check Accounts";
 
+
     }
     //Customers should not be able to transfer less than 0.01
     if(amount < 0.01) {return "Invalid amount";}
+
+	// commands from the NewBank customer are processed in this method
+	public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
+		String[] requestTokens = request.split("\\s+");
+		String requestFunction = requestTokens[0];
+		Response response = new Response();
+		response.setCustomer(customer);
+		switch(requestFunction) {
+			case "SHOWMYACCOUNTS" : {
+				response.setResponseMessage(showMyAccounts(customer));
+				return response;
+			}
+			case "NEWACCOUNT" :
+				if (requestTokens.length > 1) {
+					response.setResponseMessage(newAccount(customer, requestTokens[1]));
+					return response;
+				}
+				return null;
+			case "MOVE" :
+				if (requestTokens.length > 3) {
+					response.setResponseMessage(moveAmount(requestTokens[1], requestTokens[2], requestTokens[3], customer));
+					return response;
+				}
+				return null;
+			case "PAY" :
+				if (requestTokens.length > 4) {
+					response.setResponseMessage(payAmount(Double.parseDouble(requestTokens[1]), customer, requestTokens[2], requestTokens[3], requestTokens[4]));
+					return response;
+				}
+				return null;
+			case "LOGOUT" :
+				response.setCustomer(null);
+				response.setResponseMessage("Logout Successful.");
+				return response;
+			case "TRANSACTIONRECORD":
+				response.setResponseMessage(getTransactionRecord(customer));
+				return response;
+			case "UNLOCKUSER":
+				response.setResponseMessage(UserService.unlockUser());
+				return response;
+			default : {
+				response.setResponseMessage("Invalid Input");
+				return response;
+			}
+		}
+	}
+
+	private String showMyAccounts(CustomerID customer) {
+		ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
+		String result = "";
+        for (int i=0; i< accounts.size(); i++){
+            result += accounts.get(i).getID() + " " + accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
+        }
+		return result;
+	}
+
 
     //get Account Balance Amount
     double balance = payer.getAccount(payingAccount).getAmount();
@@ -265,7 +322,48 @@ public class NewBank {
       return "Insufficient balance.";
     }
 
+
   }
+
+	// PAY command
+	//Do I want to use Accounts or Customers?
+	// payAmount: Takes two accounts and an amount as input
+	private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
+							 String receivingCustomerKey, String receivingAccount) throws IOException {
+		//Account does not exist
+		Customer payer = customers.get(payingCustomer.getKey());
+		Customer receiver = null;
+		for (HashMap.Entry<String, Customer> entry : customers.entrySet()){
+			if (entry.getValue().getUserID().equals(receivingCustomerKey)){
+				receiver = customers.get(entry.getKey());
+			}
+		}
+	
+		if (receiver == null || payer.getAccount(payingAccount) == null || receiver.getAccountbyID(receivingAccount) == null) {
+			return "Please check Accounts";
+
+		}
+		//Customers should not be able to transfer less than 0.01
+		if(amount < 0.01) {return "Invalid amount";}
+
+		//get Account Balance Amount
+		double balance = payer.getAccount(payingAccount).getAmount();
+		//Is there enough balance?
+		if(balance >= amount) {
+			//Adjust balance for both accounts
+			payer.getAccount(payingAccount).updateBalance(-amount);
+			receiver.getAccountbyID(receivingAccount).updateBalance(amount);
+			DataHandler.updateAccountCSV(customers);
+			addTransaction(new Transaction(payer.getAccount(payingAccount).getID(), receivingAccount, amount, "Payment "));
+			//updated_balance = payer.getAccount(payingAccount).getAmount();
+
+			//return "Payment was successful.";
+			return "Payment successful";
+		}
+		else {
+			return "Insufficient balance.";
+		}
+
 
   public Customer getCustomer(CustomerID id){
     return customers.get(id.getKey());
@@ -361,6 +459,7 @@ public class NewBank {
     return "Failed to move " + amount + " to the lending account.";
   }
 
+
   private String takeBack(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InsufficientBalanceException, InvalidAccountException, IOException {
     Customer lender = customers.get(customer.getKey());
     if (loanMarketplace.transferLendingAccountToOtherAccount(lender.getUserID(), accountName, amount)) {
@@ -368,6 +467,27 @@ public class NewBank {
     }
     return "Failed to move " + amount + " from the lending account to " + accountName;
   }
+
+	private String getTransactionRecord(CustomerID customer){
+		ArrayList<Transaction> transactionRecord = getLast10Transactions(customer);
+		String result;
+		DateTimeFormatter datetime = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
+		if (transactionRecord.size() == 0){
+			return "No record found";
+		}else{
+			result = "Date       Time  Type     From       To         Amount\n";
+			for (Transaction t : transactionRecord){
+				String type = t.getType();
+				String cusID = customers.get(customer.getKey()).getUserID();
+				if (type.equals("Payment ") && t.getTo().split("-")[0].equals(cusID)){
+					type = "Received";
+				}
+				result += datetime.format(t.getDT()) +" "+type+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
+			}
+		}
+		return result;
+	}
+
 
   private String borrow(CustomerID customer, String accountName, double amount) throws InvalidAmountException, InvalidAccountException, IOException {
     Customer borrower = customers.get(customer.getKey());

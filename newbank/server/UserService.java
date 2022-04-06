@@ -39,7 +39,7 @@ public class UserService {
     private static ArrayList<Account> showAccounts(CustomerID customerID){
         ArrayList<Account> accounts = NewBank.getBank().getCustomer(customerID).getAccounts();
         for (int i=0; i< accounts.size(); i++){
-            CommunicationService.sendOut(String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount());
+            CommunicationService.sendOut(String.valueOf(i+1)+") "+ accounts.get(i).getID() + " " + accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount());
         }
         return accounts;
     }
@@ -75,19 +75,21 @@ public class UserService {
 
     public static Response pay(CustomerID customerID) throws IOException{
         Response response = new Response();
-        //ArrayList<Account> accounts = showAccounts(customerID);
+        ArrayList<Account> accounts = showAccounts(customerID);
         CommunicationService.sendOut("Please choose the account you want to use for payment");
         String payingAccount = CommunicationService.readIn();
-        CommunicationService.sendOut("Please choose the user you want to send money to");
+        CommunicationService.sendOut("Please input the account number you want to send money to");
         String receivingCustomerKey = CommunicationService.readIn();
-        CommunicationService.sendOut("Please choose the account you want to send money to");
-        String receivingAccount = CommunicationService.readIn();
         CommunicationService.sendOut("Please enter the amount you want to send:");
         String amount = CommunicationService.readIn();
         String request;
         try {
             try{
-                request = "PAY" + " " + amount + " " + payingAccount  + " " + receivingCustomerKey + " " + receivingAccount;
+                String[] temp = receivingCustomerKey.split("-");
+                if (temp.length > 2) throw new IndexOutOfBoundsException();
+                receivingCustomerKey = temp[0];
+                String receivingAccount = temp[0]+"-"+temp[1];
+                request = "PAY" + " " + amount + " " + accounts.get(Integer.parseInt(payingAccount)-1).getAccount()  + " " + receivingCustomerKey + " " + receivingAccount;
             }catch (NumberFormatException | IndexOutOfBoundsException ne){
                 throw new InvalidAccountException();
             }

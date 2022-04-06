@@ -101,6 +101,7 @@ public class Customer extends User{
 		return null;
 	}
 
+
 	public void addAvailableLoan(AvailableLoan availableLoan) {
 		availableLoans.add(availableLoan);
 		Collections.sort(availableLoans);
@@ -122,6 +123,15 @@ public class Customer extends User{
 
 	public ArrayList<AvailableLoan> getAvailableLoans() {
 		return availableLoans;
+
+	public Account getAccountbyID(String id){
+		for (int i = 0; i < accounts.size(); i++){
+			if (accounts.get(i).getID().equals(id)){
+				return accounts.get(i);
+			}
+		}
+		return null;
+    
 	}
 
 }
