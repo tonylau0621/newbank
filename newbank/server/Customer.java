@@ -123,6 +123,7 @@ public class Customer extends User{
 
 	public ArrayList<AvailableLoan> getAvailableLoans() {
 		return availableLoans;
+	}
 
 	public Account getAccountbyID(String id){
 		for (int i = 0; i < accounts.size(); i++){
