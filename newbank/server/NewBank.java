@@ -123,7 +123,7 @@ public class NewBank {
 		ArrayList<Account> accounts = this.getCustomer(customer).getAccounts();
 		String result = "";
         for (int i=0; i< accounts.size(); i++){
-            result += String.valueOf(i+1)+") "+ accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
+            result += accounts.get(i).getID() + " " + accounts.get(i).getAccount() + ": " + accounts.get(i).getAmount() + "\n";
         }
 		return result;
 	}
@@ -269,7 +269,12 @@ public class NewBank {
 		}else{
 			result = "Date       Time  Type     From       To         Amount\n";
 			for (Transaction t : transactionRecord){
-				result += datetime.format(t.getDT()) +" "+t.getType()+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
+				String type = t.getType();
+				String cusID = customers.get(customer.getKey()).getUserID();
+				if (type.equals("Payment ") && t.getTo().split("-")[0].equals(cusID)){
+					type = "Received";
+				}
+				result += datetime.format(t.getDT()) +" "+type+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
 			}
 		}
 		return result;
