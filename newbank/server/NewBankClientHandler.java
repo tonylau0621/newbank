@@ -2,7 +2,6 @@ package newbank.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -16,6 +15,7 @@ public class NewBankClientHandler extends Thread {
 	public NewBankClientHandler(Socket s) throws IOException {
 		CommunicationService.initialCommunication(s);
 		bank = NewBank.getBank();
+		bank.addLoanData();
 		in = CommunicationService.getBufferedReader();
 		out = CommunicationService.getPrintWriter();
 	}
@@ -44,7 +44,8 @@ public class NewBankClientHandler extends Thread {
 					request = in.readLine();
 				} else {
 					//Show other service if logged in
-					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Create New Account\n 5) View Transaction History\n 6) Logout");
+					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment" +
+									"\n 4) Create New Account\n 5) View Transaction History\n 6) Handle Loans\n 7) Logout");
 					String request = in.readLine();
 					response = sendRequest(customer, request);
 					customer = response.getCustomer();
@@ -83,6 +84,8 @@ public class NewBankClientHandler extends Thread {
 				toSend = "TRANSACTIONRECORD";
 				break;
 			case "6":
+				return UserService.loan(customer);
+			case "7":
 				toSend = "LOGOUT";
 				break;
 			case "L2":
