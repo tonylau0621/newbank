@@ -3,7 +3,15 @@ package newbank.form_service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contains the validation rules and interaction message for the username input field.
+ * 
+ */
 public class UserName extends Input {
+    
+    /** 
+     * @return List<ValidationRule>
+     */
     @Override
     public List<ValidationRule> getValidationRules() {
         List<ValidationRule> rules = new ArrayList<>();
@@ -12,6 +20,10 @@ public class UserName extends Input {
         return rules;
     }
 
+    
+    /** 
+     * @return String
+     */
     @Override
     public String getUserInteractionMessage() {
         return "Enter Username";

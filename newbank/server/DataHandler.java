@@ -12,7 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-
+/**
+ * Handles data flow between the bank server and the database.
+ * Reads and writes from the database files.
+ */
 public class DataHandler {
     private static String accCsv= "newbank/server/data/Account.txt";
     private static String cusCsv= "newbank/server/data/Customer.txt";
@@ -21,6 +24,10 @@ public class DataHandler {
     private static String loanCsv = "newbank/server/data/Loan.txt";
     private static String separator="#se2#"; //for handling the case that the data include comma
 
+    
+    /** 
+     * @return HashMap<String, Customer>
+     */
     public static HashMap<String, Customer> readCustData(){
         HashMap<String, Customer> customers;
         customers = readCustomer();
@@ -28,6 +35,10 @@ public class DataHandler {
         return customers;
     }
 
+    
+    /** 
+     * @return ArrayList<Transaction>
+     */
     public static ArrayList<Transaction> readTransaction(){
         ArrayList<Transaction> transactions = new ArrayList<>();
         String[] line;
@@ -50,6 +61,10 @@ public class DataHandler {
         return transactions;
     }
 
+    
+    /** 
+     * @return HashMap<String, Customer>
+     */
     private static HashMap<String, Customer> readCustomer(){
         HashMap<String, Customer> customers = new HashMap<>();
         String[] line;
@@ -71,6 +86,10 @@ public class DataHandler {
     }
 
 
+    
+    /** 
+     * @param line
+     */
     private static void getComma(String[] line){
         //replace the seperater by the comma
         for (int i=0; i<line.length;i++){
@@ -78,6 +97,10 @@ public class DataHandler {
         }
     }
 
+    
+    /** 
+     * @param customers
+     */
     private static void readAccount(HashMap<String, Customer> customers){
         String[] line;
         File accFile = new File(accCsv);
@@ -142,7 +165,10 @@ public class DataHandler {
         return loans;
     }
 
-
+    /** 
+     * @param customers
+     * @throws IOException
+     */
     public static void updateCustomerCSV(Map<String, Customer> customers) throws IOException {
         // write back staff data
         File file = new File(cusCsv);
@@ -169,6 +195,11 @@ public class DataHandler {
       }
     }
 
+    
+    /** 
+     * @param customers
+     * @throws IOException
+     */
     public static void updateAccountCSV(Map<String, Customer> customers) throws IOException {
         // write back staff data
         File file = new File(accCsv);
@@ -192,6 +223,11 @@ public class DataHandler {
       }
     }
 
+    
+    /** 
+     * @param transactions
+     * @throws IOException
+     */
     public static void updateTransactionCSV(ArrayList<Transaction> transactions) throws IOException {
         // write back staff data
         File file = new File(tranCsv);

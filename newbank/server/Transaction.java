@@ -2,6 +2,10 @@ package newbank.server;
 
 import java.time.Instant;
 
+/**
+ * Represents a transaction to be processed by the bank.
+ * The transaction is then able to be logged to the database.
+ */
 public class Transaction implements Comparable<Transaction>{
     private String id;
     private Instant dateAndTime;
@@ -31,35 +35,68 @@ public class Transaction implements Comparable<Transaction>{
         count++;
     }
 
+    
+    /** 
+     * @param o
+     * @return int
+     */
     @Override
     public int compareTo(Transaction o) {
         return this.dateAndTime.compareTo(o.dateAndTime);
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getFrom(){
         return this.from;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getTo(){
         return this.to;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getID(){
         return this.id;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getDateAndTime(){
         return this.dateAndTime.toString();
     }
 
+    
+    /** 
+     * @return Instant
+     */
     public Instant getDT(){
         return this.dateAndTime;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getType(){
         return this.type;
     }
 
+    
+    /** 
+     * @return double
+     */
     public double getAmount(){
         return this.amount;
     }

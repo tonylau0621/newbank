@@ -2,7 +2,19 @@ package newbank.server;
 
 import java.io.IOException;
 
+/**
+ * Admin request handler, including login requests.
+ */
 public class AdminService {
+  
+  /** 
+   * Logs in an admin account.
+   * This currently NewBank's adminLogin method, but this is subject to change.
+   * 
+   * @return CustomerID
+   * @throws IOException
+   * @throws InterruptedException
+   */
   public static CustomerID login() throws IOException, InterruptedException {
     CommunicationService.sendOut("Enter Username");
     String userName = CommunicationService.readIn();

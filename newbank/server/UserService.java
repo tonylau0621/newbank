@@ -11,10 +11,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Contains the functionality of all the user operations within the bank.
+ * See the individual methods for more details.
+ */
 public class UserService {
     public static final Integer MAX_LOGIN_ATTEMPT = 3;
     public static Map<String, Integer> userMapByLoginAttempt = new HashMap<>();
+    
+    /** 
+     * Asks for the client's login details, and attempts to log in with a new CustomerID.
+     * 
+     * @return CustomerID
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static CustomerID login() throws IOException, InterruptedException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
@@ -35,6 +46,13 @@ public class UserService {
         return customer;
     }
 
+    
+    /** 
+     * Shows the accounts held by a customer.
+     * 
+     * @param customerID
+     * @return ArrayList<Account>
+     */
     //show the accounts for the user to choose.
     private static ArrayList<Account> showAccounts(CustomerID customerID){
         ArrayList<Account> accounts = NewBank.getBank().getCustomer(customerID).getAccounts();
@@ -44,6 +62,14 @@ public class UserService {
         return accounts;
     }
 
+    
+    /** 
+     * Moves money between two accounts held by one customer.
+     * 
+     * @param customerID
+     * @return Response
+     * @throws IOException
+     */
     public static Response move(CustomerID customerID) throws IOException{
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
@@ -73,6 +99,14 @@ public class UserService {
         }
     }
 
+    
+    /** 
+     * Pays money from the current customer's account, to a chosen account held by another customer.
+     * 
+     * @param customerID
+     * @return Response
+     * @throws IOException
+     */
     public static Response pay(CustomerID customerID) throws IOException{
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
@@ -101,6 +135,14 @@ public class UserService {
         }
     }
 
+    
+    /** 
+     * Creates a new empty account for the customer, with a custom name.
+     * 
+     * @param customerID
+     * @return Response
+     * @throws IOException
+     */
     public static Response newAccount(CustomerID customerID) throws IOException {
         Response response = new Response();
         CommunicationService.sendOut("Enter Account Name");
@@ -123,6 +165,14 @@ public class UserService {
         }
     }
 
+    
+    /** 
+     * Unlocks a user that has been locked out of the system for too many failed login attempts.
+     * 
+     * @return String
+     * @throws IOException
+     * @throws InvalidUserNameException
+     */
     public static String unlockUser() throws IOException, InvalidUserNameException {
         CommunicationService.sendOut("Enter username to unlock");
         String username = CommunicationService.readIn();
@@ -132,6 +182,15 @@ public class UserService {
         return username + " has been unlocked.";
     }
 
+    
+    /** 
+     * Adds a new customer to the system.
+     * Creates a unique customer ID and adds the customer to the bank.
+     * 
+     * @return Response
+     * @throws IOException
+     * @throws InterruptedException
+     */
     //Add new customer
     public static Response newCustomer() throws IOException, InterruptedException{
         String userName = new UserName().getInput();
