@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.lang.model.util.ElementScanner6;
+
 /**
  * Contains the functionality of all the user operations within the bank.
  * See the individual methods for more details.
@@ -291,6 +293,40 @@ public class UserService {
         response.setCustomer(customerID);
         response.setResponseMessage("");
         return response;
+    }
+
+    public static Response transaction(CustomerID customerID) throws IOException {
+        Response response = new Response();
+        CommunicationService.sendOut("1) Transaction Record for all account\n2) Transaction Record for specific account");
+        String option = CommunicationService.readIn();
+        try{
+
+            if (option.equals("1")) {
+                return NewBank.getBank().processRequest(customerID, "TRANSACTIONRECORD");
+            }
+            else if (option.equals("2")) {
+                ArrayList<Account> accounts = showAccounts(customerID);
+                CommunicationService.sendOut("Please choose the account you want to check");
+                String account = CommunicationService.readIn();
+                try {
+                    account = accounts.get(Integer.parseInt(account)-1).getID();
+                    return NewBank.getBank().processRequest(customerID, "TRANSATIONRECORDACC "+account);
+                }catch (NumberFormatException | IndexOutOfBoundsException ne){
+                    throw new InvalidAccountException();
+                }
+            }
+            else{
+                response.setCustomer(customerID);
+                response.setResponseMessage("Invalid Input");
+                return response;
+            }
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }
+
+
     }
 
 }

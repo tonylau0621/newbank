@@ -93,8 +93,7 @@ public class NewBankClientHandler extends Thread {
 			case "4":
 				return UserService.newAccount(customer);
 			case "5":
-				toSend = "TRANSACTIONRECORD";
-				break;
+				return UserService.transaction(customer);
 			case "6":
 				return UserService.loan(customer);
 			case "7":
