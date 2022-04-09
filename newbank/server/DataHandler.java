@@ -178,16 +178,20 @@ public class DataHandler {
         try (FileWriter writer = new FileWriter(file)){
         // Writes the content to the file
         String header = "id, username, password, firstName, lastName, phone, email, address\n";
+        Encryption encryption = new Encryption(header.split(",").length);
         writer.write(header);
+        String line = "";
         for(Map.Entry<String, Customer> customer : customers.entrySet()){
-            writer.write(customer.getValue().getUserID().replace(",",separator)+","+
+            line = customer.getValue().getUserID().replace(",",separator)+","+
                          customer.getKey().replace(",",separator)+","+
                          customer.getValue().getPassword().replace(",",separator)+","+
                          customer.getValue().getFirstName().replace(",",separator)+","+
                          customer.getValue().getLastName().replace(",",separator)+","+
                          customer.getValue().getPhone().replace(",",separator)+","+
                          customer.getValue().getEmail().replace(",",separator)+","+
-                         customer.getValue().getAddress().replace(",",separator)+"\n");
+                         customer.getValue().getAddress().replace(",",separator);
+            line = encryption.encrypt(line) + "\n";
+            writer.write(line);
         }
         
         writer.flush();
@@ -209,12 +213,16 @@ public class DataHandler {
         try (FileWriter writer = new FileWriter(file)){
         // Writes the content to the file
         String header = "id, name, balance, customer_id\n";
+        Encryption encryption = new Encryption(header.split(",").length);
+        String line = "";
         writer.write(header);
         for(Customer customer : customers.values()){
             for (Account account : customer.getAccounts()){
-                writer.write(account.getID().replace(",",separator)+","+
+                line = account.getID().replace(",",separator)+","+
                             account.getAccount().replace(",",separator)+","+
-                            Double.toString(account.getAmount())+"\n");
+                            Double.toString(account.getAmount());
+            line = encryption.encrypt(line) + "\n";
+            writer.write(line);
             }
         }
         
@@ -237,14 +245,18 @@ public class DataHandler {
         try (FileWriter writer = new FileWriter(file)){
         // Writes the content to the file
         String header = "id, date&time, amount, from_id, to_id, type\n";
+        Encryption encryption = new Encryption(header.split(",").length);
+        String line = "";
         writer.write(header);
         for(Transaction transaction : transactions){
-            writer.write(transaction.getID().replace(",",separator)+","+
+            line = transaction.getID().replace(",",separator)+","+
                         transaction.getDateAndTime().replace(",",separator)+","+
                         String.valueOf(transaction.getAmount()).replace(",",separator)+","+
                         transaction.getFrom().replace(",",separator)+","+
                         transaction.getTo().replace(",",separator)+","+
-                        transaction.getType().replace(",",separator)+"\n");
+                        transaction.getType().replace(",",separator)+"\n";
+            line = encryption.encrypt(line) + "\n";
+            writer.write(line);
         }
         
         writer.flush();
@@ -261,12 +273,16 @@ public class DataHandler {
         try (FileWriter writer = new FileWriter(file)){
             // Writes the content to the file
             String header = "id, lender_id, amount, still_available\n";
+            Encryption encryption = new Encryption(header.split(",").length);
+            String line = "";
             writer.write(header);
             for (AvailableLoan availableLoan : availableLoans) {
-                writer.write(String.valueOf(availableLoan.getAvailableLoanID()).replace(",",separator)+","+
+                line = String.valueOf(availableLoan.getAvailableLoanID()).replace(",",separator)+","+
                         availableLoan.getLenderUserID().replace(",",separator)+","+
                         String.valueOf(availableLoan.getAmount()).replace(",",separator)+","+
-                        String.valueOf(availableLoan.isStillAvailable()).replace(",",separator)+"\n");
+                        String.valueOf(availableLoan.isStillAvailable()).replace(",",separator)+"\n";
+                line = encryption.encrypt(line) + "\n";
+                writer.write(line);
             }
             writer.flush();
             writer.close();
@@ -282,14 +298,18 @@ public class DataHandler {
         try (FileWriter writer = new FileWriter(file)){
             // Writes the content to the file
             String header = "id, lender_id, borrower_id, loan_amount, remaining_amount, all_repaid\n";
+            Encryption encryption = new Encryption(header.split(",").length);
+            String line = "";
             writer.write(header);
             for (Loan loan : loans) {
-                writer.write(String.valueOf(loan.getLoanID()).replace(",",separator)+","+
+                line = String.valueOf(loan.getLoanID()).replace(",",separator)+","+
                         loan.getLenderUserID().replace(",",separator)+","+
                         loan.getBorrowerUserID().replace(",",separator)+","+
                         String.valueOf(loan.getLoanAmount()).replace(",",separator)+","+
                         String.valueOf(loan.getRemainingAmount()).replace(",",separator)+","+
-                        String.valueOf(loan.isAllRepaid()).replace(",",separator)+"\n");
+                        String.valueOf(loan.isAllRepaid()).replace(",",separator)+"\n";
+                line = encryption.encrypt(line) + "\n";
+                writer.write(line);
             }
             writer.flush();
             writer.close();

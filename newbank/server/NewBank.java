@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.xml.crypto.Data;
+
 /**
  * The NewBank class is the main class of the server.
  * It contains all of the data structures and methods of the bank.

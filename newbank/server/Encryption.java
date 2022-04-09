@@ -2,9 +2,13 @@ package newbank.server;
 
 public class Encryption {
 
-    public String encrypt(String input) {
+    int key;
 
-    int key = 5;
+    public Encryption(int key) {
+        this.key = key;
+    }
+
+    public String encrypt(String input) {
     char[] x = input.toCharArray();
     String input_encrypted = "";
     for(char c : x)  {
@@ -15,8 +19,6 @@ public class Encryption {
     }
 
     public String decrypt(String input) {
-
-    int key = 5;
     char[] x = input.toCharArray();
     String input_decrypted = "";
     for(char c : x) {
