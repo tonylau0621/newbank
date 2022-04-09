@@ -42,13 +42,16 @@ public class DataHandler {
     public static ArrayList<Transaction> readTransaction(){
         ArrayList<Transaction> transactions = new ArrayList<>();
         String[] line;
+        String templine;
         File tranFile = new File(tranCsv);
         try (Scanner scanner = new Scanner(tranFile)){
             //skip header
             line = scanner.nextLine().split(",");
+            Encryption encryption = new Encryption(line.length);
             //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",");
+                templine = scanner.nextLine();
+                line = encryption.decrypt(templine).split(",", -1);
                 getComma(line);
                 Transaction transaction = new Transaction(line[0],line[1],line[2],line[3],line[4],line[5]);
                 transactions.add(transaction);
@@ -68,13 +71,16 @@ public class DataHandler {
     private static HashMap<String, Customer> readCustomer(){
         HashMap<String, Customer> customers = new HashMap<>();
         String[] line;
+        String templine;
         File cusFile = new File(cusCsv);
         try (Scanner scanner = new Scanner(cusFile)){
             //skip header
             line = scanner.nextLine().split(",");
+            Encryption encryption = new Encryption(line.length);
             //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",", -1);
+                templine = scanner.nextLine();
+                line = encryption.decrypt(templine).split(",", -1);
                 getComma(line);
                 Customer customer = new Customer(line[0],line[2],line[3],line[4],line[5],line[6], line[7]);
                 customers.put(line[1],customer);
@@ -103,12 +109,16 @@ public class DataHandler {
      */
     private static void readAccount(HashMap<String, Customer> customers){
         String[] line;
+        String templine;
         File accFile = new File(accCsv);
         try (Scanner scanner = new Scanner(accFile)){
             //move to next line
             line = scanner.nextLine().split(",");
+            Encryption encryption = new Encryption(line.length);
+            //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",");
+                templine = scanner.nextLine();
+                line = encryption.decrypt(templine).split(",", -1);
                 getComma(line);
                 Account account = new Account(line[0], line[1],Double.parseDouble(line[2]));
                 //get customer by customerid and add the account to the customer
@@ -128,13 +138,16 @@ public class DataHandler {
     public static ArrayList<AvailableLoan> readAvailableLoan() {
         ArrayList<AvailableLoan> availableLoans = new ArrayList<>();
         String[] line;
+        String templine;
         File availLoanFile = new File(availLoanCsv);
         try (Scanner scanner = new Scanner(availLoanFile)){
             //skip header
             line = scanner.nextLine().split(",");
+            Encryption encryption = new Encryption(line.length);
             //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",", -1);
+                templine = scanner.nextLine();
+                line = encryption.decrypt(templine).split(",", -1);
                 getComma(line);
                 AvailableLoan availableLoan = new AvailableLoan(Long.parseLong(line[0]),line[1],Double.parseDouble(line[2]), line[3].equals("true"));
                 availableLoans.add(availableLoan);
@@ -148,13 +161,16 @@ public class DataHandler {
     public static ArrayList<Loan> readLoan() {
         ArrayList<Loan> loans = new ArrayList<>();
         String[] line;
+        String templine;
         File loanFile = new File(loanCsv);
         try (Scanner scanner = new Scanner(loanFile)){
             //skip header
             line = scanner.nextLine().split(",");
+            Encryption encryption = new Encryption(line.length);
             //read linebyline and put to hashmap
             while(scanner.hasNextLine()){
-                line = scanner.nextLine().split(",", -1);
+                templine = scanner.nextLine();
+                line = encryption.decrypt(templine).split(",", -1);
                 getComma(line);
                 Loan loan = new Loan(Long.parseLong(line[0]), line[1], line[2], Double.parseDouble(line[3]), Double.parseDouble(line[4]), line[5].equals("true"));
                 loans.add(loan);
