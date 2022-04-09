@@ -2,10 +2,13 @@ package newbank.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Communication handler instantiated on each client connection.
+ * Sends and receives messages from the client and server.
+ */
 public class NewBankClientHandler extends Thread {
 	
 	private NewBank bank;
@@ -16,6 +19,7 @@ public class NewBankClientHandler extends Thread {
 	public NewBankClientHandler(Socket s) throws IOException {
 		CommunicationService.initialCommunication(s);
 		bank = NewBank.getBank();
+		bank.addLoanData();
 		in = CommunicationService.getBufferedReader();
 		out = CommunicationService.getPrintWriter();
 	}
@@ -44,7 +48,8 @@ public class NewBankClientHandler extends Thread {
 					request = in.readLine();
 				} else {
 					//Show other service if logged in
-					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment\n 4) Create New Account\n 5) View Transaction History\n 6) Logout");
+					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment" +
+									"\n 4) Create New Account\n 5) View Transaction History\n 6) Handle Loans\n 7) Logout");
 					String request = in.readLine();
 					response = sendRequest(customer, request);
 					customer = response.getCustomer();
@@ -67,6 +72,14 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @param request
+	 * @return Response
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException{
 		String toSend = "";
 		switch(request){
@@ -83,6 +96,8 @@ public class NewBankClientHandler extends Thread {
 				toSend = "TRANSACTIONRECORD";
 				break;
 			case "6":
+				return UserService.loan(customer);
+			case "7":
 				toSend = "LOGOUT";
 				break;
 			case "L2":
@@ -98,6 +113,14 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @param customer
+	 * @param request
+	 * @return Response
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
 		String toSend = "";
 		switch(request){
@@ -118,6 +141,12 @@ public class NewBankClientHandler extends Thread {
 		}
 	}
 
+	
+	/** 
+	 * @return CustomerID
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private CustomerID welcomePage() throws IOException, InterruptedException{
 		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
 		String input = in.readLine();

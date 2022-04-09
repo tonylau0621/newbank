@@ -1,0 +1,6 @@
+id, lender_id, amount, still_available
+1,00243584,0.0,false
+2,18392702,187.0,true
+3,00243584,400.0,true
+4,47971955,950.0,true
+5,01513347,1275.0,true

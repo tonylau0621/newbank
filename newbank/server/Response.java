@@ -1,5 +1,8 @@
 package newbank.server;
 
+/**
+ * Represents a response to be sent to a client.
+ */
 public class Response {
     private String responseMessage;
     private CustomerID customer;

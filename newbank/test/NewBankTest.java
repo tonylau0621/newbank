@@ -51,6 +51,7 @@ public class NewBankTest {
     }
     fail("Logged in with wrong username and/or password");
   }
+  
   // End of Tests for login
 
 
@@ -76,6 +77,7 @@ public class NewBankTest {
     fail(customer.getFirstName() + "'s " + accountType + " account not found/not probably set.");
   }
 
+  
   @ParameterizedTest
   @MethodSource("newbank.test.TestingData#provideCustomerIDAndInvalidNewAccountCommand")
   public void invalidNewAccountCommand(CustomerID customerID, String command) {
@@ -189,6 +191,7 @@ public class NewBankTest {
     Assertions.assertEquals(account2OldBalance, account2.getAmount());
 
   }
+  
   // End of tests for MOVE
 
 
@@ -284,7 +287,7 @@ public class NewBankTest {
   public void generateManyUniqueUserID() {
     String[] userIDs = new String[20000];
     for (int i = 0; i < userIDs.length; i++) {
-      userIDs[i] = bank.generateUserID(customers);
+      userIDs[i] = bank.generateUserID();
       customers.put("testingUser"+i, new Customer(userIDs[i], "", "", "", "", "", ""));
       //System.out.println(userIDs[i]);
       for (int j = 0; j < i; j++) {
