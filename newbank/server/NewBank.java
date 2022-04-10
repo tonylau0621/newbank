@@ -87,16 +87,17 @@ public class NewBank {
 	 * @throws MaxLoginAttemptReachException
 	 */
   public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException, MaxLoginAttemptReachException {
-    boolean isValidUserName = (customers.containsKey(userName));
+    boolean isValidUserName = (customers.containsKey(userName) || admins.containsKey(userName));
     if(!isValidUserName) throw new InvalidUserNameException();
     if(UserService.userMapByLoginAttempt.containsKey(userName)) {
       Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
       if(userLoginAttempt >= UserService.MAX_LOGIN_ATTEMPT) throw new MaxLoginAttemptReachException();
     }
-    Customer targetCustomer = customers.get(userName);
-    CustomerID targetCustomerId = new CustomerID(userName, false);
+    User targetCustomer = (customers.containsKey(userName)) ? customers.get(userName) : admins.get(userName);
+    Boolean isAdmin = targetCustomer instanceof Admin;
+    CustomerID targetCustomerId = new CustomerID(userName, isAdmin);
     boolean isValidPassword = (targetCustomer.checkPassword(password));
-    if(!isValidPassword) {
+    if(!isValidPassword && !isAdmin) {
       if(!UserService.userMapByLoginAttempt.containsKey(userName)) {
         UserService.userMapByLoginAttempt.put(userName, 1);
       } else {
@@ -112,7 +113,8 @@ public class NewBank {
   }
 
   /** 
-	 * Checks the input admin login details against the database by communicating with the {@link UserService}.
+	 * **THIS METHOD IS OBSOLETE DUE TO THE REFACTORING OF LOGIN FEATURE TO SUPPORT ADMIN? LOGIN**
+     * Checks the input admin login details against the database by communicating with the {@link UserService}.
 	 * This method is due to be merged with the normal checkLogInDetails method.
 	 * 
 	 * @param userName

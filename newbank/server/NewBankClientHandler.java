@@ -162,9 +162,6 @@ public class NewBankClientHandler extends Thread {
 				input = in.readLine();
 			}
 		}
-		else if (input.equals("adminLogin")){
-			return AdminService.login();
-		}
 		return null;
 	}
 }
