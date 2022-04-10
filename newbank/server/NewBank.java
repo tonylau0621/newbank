@@ -180,6 +180,9 @@ public class NewBank {
       case "TRANSACTIONRECORD":
         response.setResponseMessage(getTransactionRecord(customer));
         return response;
+      case "TRANSATIONRECORDACC":
+        response.setResponseMessage(getTransactionRecord(requestTokens[1]));
+        return response;
       case "UNLOCKUSER":
         response.setResponseMessage(UserService.unlockUser());
         return response;
@@ -428,6 +431,24 @@ public class NewBank {
     return result;
   }
 
+    /** 
+	 * @param customer,account
+	 * @return String
+	 */
+  private String getTransactionRecord(String account){
+    ArrayList<Transaction> transactionRecord = getLast10Transactions(account);
+    String result;
+    DateTimeFormatter datetime = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
+    if (transactionRecord.size() == 0){
+      return "No record found";
+    }else{
+      result = "Date       Time  Type     From       To         Amount\n";
+      for (Transaction t : transactionRecord){
+        result += datetime.format(t.getDT()) +" "+t.getType()+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
+      }
+    }
+    return result;
+  }
   /** 
 	 * @param customer
 	 * @return ArrayList<Transaction>
@@ -438,6 +459,22 @@ public class NewBank {
     ArrayList<Transaction> result = new ArrayList<>();
     for (int i = 0; i < transactions.size(); i++){
       if (transactions.get(i).getFrom().split("-")[0].equals(userID) || transactions.get(i).getTo().split("-")[0].equals(userID)){
+        result.add(transactions.get(i));
+      }
+      if (result.size() == 10) break;
+    }
+    return result;
+  }
+
+    /** 
+	 * @param customer,account
+	 * @return ArrayList<Transaction>
+	 */
+  private ArrayList<Transaction> getLast10Transactions(String account){
+    //get UserID
+    ArrayList<Transaction> result = new ArrayList<>();
+    for (int i = 0; i < transactions.size(); i++){
+      if (transactions.get(i).getFrom().equals(account) || transactions.get(i).getTo().equals(account)){
         result.add(transactions.get(i));
       }
       if (result.size() == 10) break;
