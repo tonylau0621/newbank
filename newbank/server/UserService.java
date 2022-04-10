@@ -26,7 +26,7 @@ public class UserService {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static CustomerID login() throws IOException, InterruptedException {
+    public static CustomerID login() throws IOException, InterruptedException, SessionTimeoutException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
         // ask for password
@@ -70,7 +70,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response move(CustomerID customerID) throws IOException{
+    public static Response move(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
         CommunicationService.sendOut("Please choose the account you want to send money from");
@@ -107,7 +107,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response pay(CustomerID customerID) throws IOException{
+    public static Response pay(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
         CommunicationService.sendOut("Please choose the account you want to use for payment");
@@ -143,7 +143,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response newAccount(CustomerID customerID) throws IOException {
+    public static Response newAccount(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         CommunicationService.sendOut("Enter Account Name");
         String accName = CommunicationService.readIn();
@@ -173,7 +173,7 @@ public class UserService {
      * @throws IOException
      * @throws InvalidUserNameException
      */
-    public static String unlockUser() throws IOException, InvalidUserNameException {
+    public static String unlockUser() throws IOException, InvalidUserNameException, SessionTimeoutException {
         CommunicationService.sendOut("Enter username to unlock");
         String username = CommunicationService.readIn();
         boolean isValidUserName = (NewBank.getBank().getCustomers().containsKey(username));
@@ -192,7 +192,7 @@ public class UserService {
      * @throws InterruptedException
      */
     //Add new customer
-    public static Response newCustomer() throws IOException, InterruptedException{
+    public static Response newCustomer() throws IOException, InterruptedException, SessionTimeoutException {
         String userName = new UserName().getInput();
         String password = new Password().getInput();
         CommunicationService.sendOut("Enter Firstname");
@@ -215,7 +215,7 @@ public class UserService {
 
     }
 
-    public static Response loan(CustomerID customerID) throws IOException {
+    public static Response loan(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         Customer customer = NewBank.getBank().getCustomer(customerID);
 

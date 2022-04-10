@@ -62,7 +62,7 @@ public class NewBankTest {
     Response processRequestResult = new Response();
     try {
       processRequestResult = bank.processRequest(customerID, command);
-    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
       e.printStackTrace();
     }
     Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
@@ -96,7 +96,7 @@ public class NewBankTest {
     try {
       try {
         processRequestResult = bank.processRequest(customerID, command);
-      } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+      } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
@@ -140,7 +140,7 @@ public class NewBankTest {
     Response processRequestResult = new Response();
     try {
       processRequestResult = bank.processRequest(customerID, command);
-    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
       e.printStackTrace();
     }
     Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
@@ -182,7 +182,7 @@ public class NewBankTest {
     Response processRequestResult = new Response();
     try {
       processRequestResult = bank.processRequest(customerID, command);
-    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
       e.printStackTrace();
     }
     Assertions.assertEquals("FAIL", processRequestResult.getResponseMessage());
@@ -211,7 +211,7 @@ public class NewBankTest {
     Response processRequestResult = new Response();
     try {
       processRequestResult = bank.processRequest(customerID, command);
-    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+    } catch (IOException | InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
       e.printStackTrace();
     }
     Assertions.assertEquals("SUCCESS", processRequestResult.getResponseMessage());
@@ -257,7 +257,7 @@ public class NewBankTest {
           try {
             try {
               processRequestResult = bank.processRequest(customerID, command);
-            } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException | SessionTimeoutException e) {
               // TODO Auto-generated catch block
               e.printStackTrace();
             }
