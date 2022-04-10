@@ -227,6 +227,7 @@ public class UserService {
         String request = "";
         String question1 = "";
         String question2 = "";
+        String question3 = "";
 
         switch (functionRequest) {
             case "1":
@@ -264,7 +265,6 @@ public class UserService {
         }
 
         if (!request.equals("")) {
-            ArrayList<Account> accounts = customer.getAccounts();
             CommunicationService.sendOut("Your accounts details:");
             CommunicationService.sendOut(NewBank.getBank().showMyAccounts(customerID));
             CommunicationService.sendOut(question1);
@@ -276,12 +276,54 @@ public class UserService {
             request = request + " " + accountName + " " + amount;
             try {
                 if (accountName.contains(" ")) throw new InvalidAccountException();
+
+                // Confirmation
                 try {
-                    Double.parseDouble(amount);
+                    double amountDouble = Double.parseDouble(amount);
+                    switch (functionRequest) {
+                        case "1":
+                            if (amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "Are you sure to send " + amountDouble + " from " + accountName + " to lending account? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                        case "2":
+                            if (amountDouble <= customer.getTotalAvailableLoans()) {
+                                question3 = "Are you sure to send " + amountDouble + " from lending account to " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                        case "3":
+                            if (amountDouble <= Math.min(customer.getRemainingLoanLimit(), NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount(customer.getUserID()))) {
+                                question3 = "Are you sure to borrow " + amountDouble + " and send it to " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InvalidAmountException();
+                            }
+                            break;
+                        case "4":
+                            if (amountDouble <= customer.getTotalRemainingDebt() && amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "Are you sure to repaid " + amountDouble + " from " + accountName + "? (Y/N)";
+                            } else if (amountDouble > customer.getTotalRemainingDebt() && amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "You have entered the repaid amount " + amountDouble + " which is more than enough. You only need to repay " + customer.getTotalRemainingDebt();
+                                question3 += "\nAre you sure to repay " + customer.getTotalRemainingDebt() + " from " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                    }
                 } catch (NumberFormatException e) {
                     throw new InvalidAmountException();
                 }
-                return NewBank.getBank().processRequest(customerID, request);
+
+                CommunicationService.sendOut(question3);
+                String confirmation = CommunicationService.readIn();
+
+                if (confirmation.trim().equalsIgnoreCase("Y")) {
+                    return NewBank.getBank().processRequest(customerID, request);
+                }
+
             } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
                 response.setCustomer(customerID);
                 response.setResponseMessage(e.getMessage());
