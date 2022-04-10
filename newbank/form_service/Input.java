@@ -1,6 +1,7 @@
 package newbank.form_service;
 
 import newbank.server.CommunicationService;
+import newbank.server.SessionTimeoutException;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +19,7 @@ abstract class Input {
      * @return String
      * @throws IOException
      */
-    public String getInput() throws IOException {
+    public String getInput() throws IOException, SessionTimeoutException {
         String result;
         do {
             CommunicationService.sendOut(this.getUserInteractionMessage());

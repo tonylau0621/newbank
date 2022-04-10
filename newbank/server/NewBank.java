@@ -143,7 +143,7 @@ public class NewBank {
 	 * @throws InvalidAccountException
 	 * @throws InvalidUserNameException
 	 */
-  public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
+  public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException, SessionTimeoutException {
     String[] requestTokens = request.split("\\s+");
     String requestFunction = requestTokens[0];
     Response response = new Response();
@@ -205,6 +205,10 @@ public class NewBank {
           return response;
         }
         break;
+      case "TERMINATE":
+      case "":
+          response.setResponseMessage("session timeout");
+          return response;
       default : {
         response.setResponseMessage("Invalid Input");
         return response;
