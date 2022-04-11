@@ -186,13 +186,14 @@ public class LoanMarketplace {
     NewBank bank = NewBank.getBank();
     Customer borrower = bank.getCustomer(borrowerUserID);
     if (borrower != null) {
+      double realAmount = amount < borrower.getTotalRemainingDebt() ? amount : borrower.getTotalRemainingDebt();
       Account account = borrower.getAccount(paidAccountName);
       if (account == null) throw new InvalidAccountException();
-      if (amount < 0.01) throw new InvalidAmountException();
-      if (account.getAmount() < amount) throw new InsufficientBalanceException();
+      if (realAmount < 0.01) throw new InvalidAmountException();
+      if (account.getAmount() < realAmount) throw new InsufficientBalanceException();
 
       ArrayList<Loan> borrowedLoans = borrower.getBorrowedLoans();
-      double remaining = amount;
+      double remaining = realAmount;
       // lendersMap integrates the loans so that if there are more than one loans with the same lender,
       // lendersMap can combine them in transaction.
       HashMap<String, Double> lendersMap = new HashMap<>();
@@ -228,7 +229,7 @@ public class LoanMarketplace {
       }
 
       // Update the borrower's transaction (and database)
-      bank.addTransaction(new Transaction(account.getID(), "99999999-1", amount, "Repayment"));
+      bank.addTransaction(new Transaction(account.getID(), "99999999-1", realAmount, "Repayment"));
 
       // Update database
       DataHandler.updateAvailableLoanCSV(availableLoans);

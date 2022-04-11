@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.lang.model.util.ElementScanner6;
+
 /**
  * Contains the functionality of all the user operations within the bank.
  * See the individual methods for more details.
@@ -26,7 +28,7 @@ public class UserService {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static CustomerID login() throws IOException, InterruptedException {
+    public static CustomerID login() throws IOException, InterruptedException, SessionTimeoutException {
         CommunicationService.sendOut("Enter Username");
         String userName = CommunicationService.readIn();
         // ask for password
@@ -70,7 +72,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response move(CustomerID customerID) throws IOException{
+    public static Response move(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
         CommunicationService.sendOut("Please choose the account you want to send money from");
@@ -107,7 +109,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response pay(CustomerID customerID) throws IOException{
+    public static Response pay(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         ArrayList<Account> accounts = showAccounts(customerID);
         CommunicationService.sendOut("Please choose the account you want to use for payment");
@@ -143,7 +145,7 @@ public class UserService {
      * @return Response
      * @throws IOException
      */
-    public static Response newAccount(CustomerID customerID) throws IOException {
+    public static Response newAccount(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         CommunicationService.sendOut("Enter Account Name");
         String accName = CommunicationService.readIn();
@@ -173,7 +175,7 @@ public class UserService {
      * @throws IOException
      * @throws InvalidUserNameException
      */
-    public static String unlockUser() throws IOException, InvalidUserNameException {
+    public static String unlockUser() throws IOException, InvalidUserNameException, SessionTimeoutException {
         CommunicationService.sendOut("Enter username to unlock");
         String username = CommunicationService.readIn();
         boolean isValidUserName = (NewBank.getBank().getCustomers().containsKey(username));
@@ -192,7 +194,7 @@ public class UserService {
      * @throws InterruptedException
      */
     //Add new customer
-    public static Response newCustomer() throws IOException, InterruptedException{
+    public static Response newCustomer() throws IOException, InterruptedException, SessionTimeoutException {
         String userName = new UserName().getInput();
         String password = new Password().getInput();
         CommunicationService.sendOut("Enter Firstname");
@@ -215,7 +217,7 @@ public class UserService {
 
     }
 
-    public static Response loan(CustomerID customerID) throws IOException {
+    public static Response loan(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         Customer customer = NewBank.getBank().getCustomer(customerID);
 
@@ -227,6 +229,7 @@ public class UserService {
         String request = "";
         String question1 = "";
         String question2 = "";
+        String question3 = "";
 
         switch (functionRequest) {
             case "1":
@@ -264,7 +267,6 @@ public class UserService {
         }
 
         if (!request.equals("")) {
-            ArrayList<Account> accounts = customer.getAccounts();
             CommunicationService.sendOut("Your accounts details:");
             CommunicationService.sendOut(NewBank.getBank().showMyAccounts(customerID));
             CommunicationService.sendOut(question1);
@@ -276,12 +278,54 @@ public class UserService {
             request = request + " " + accountName + " " + amount;
             try {
                 if (accountName.contains(" ")) throw new InvalidAccountException();
+
+                // Confirmation
                 try {
-                    Double.parseDouble(amount);
+                    double amountDouble = Double.parseDouble(amount);
+                    switch (functionRequest) {
+                        case "1":
+                            if (amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "Are you sure to send " + amountDouble + " from " + accountName + " to lending account? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                        case "2":
+                            if (amountDouble <= customer.getTotalAvailableLoans()) {
+                                question3 = "Are you sure to send " + amountDouble + " from lending account to " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                        case "3":
+                            if (amountDouble <= Math.min(customer.getRemainingLoanLimit(), NewBank.getBank().getLoanMarketplace().getTotalAvailableLoanAmount(customer.getUserID()))) {
+                                question3 = "Are you sure to borrow " + amountDouble + " and send it to " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InvalidAmountException();
+                            }
+                            break;
+                        case "4":
+                            if (amountDouble <= customer.getTotalRemainingDebt() && amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "Are you sure to repaid " + amountDouble + " from " + accountName + "? (Y/N)";
+                            } else if (amountDouble > customer.getTotalRemainingDebt() && amountDouble <= customer.getAccount(accountName).getAmount()) {
+                                question3 = "You have entered the repaid amount " + amountDouble + " which is more than enough. You only need to repay " + customer.getTotalRemainingDebt();
+                                question3 += "\nAre you sure to repay " + customer.getTotalRemainingDebt() + " from " + accountName + "? (Y/N)";
+                            } else {
+                                throw new InsufficientBalanceException();
+                            }
+                            break;
+                    }
                 } catch (NumberFormatException e) {
                     throw new InvalidAmountException();
                 }
-                return NewBank.getBank().processRequest(customerID, request);
+
+                CommunicationService.sendOut(question3);
+                String confirmation = CommunicationService.readIn();
+
+                if (confirmation.trim().equalsIgnoreCase("Y")) {
+                    return NewBank.getBank().processRequest(customerID, request);
+                }
+
             } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
                 response.setCustomer(customerID);
                 response.setResponseMessage(e.getMessage());
@@ -291,6 +335,40 @@ public class UserService {
         response.setCustomer(customerID);
         response.setResponseMessage("");
         return response;
+    }
+
+    public static Response transaction(CustomerID customerID) throws IOException {
+        Response response = new Response();
+        CommunicationService.sendOut("1) Transaction Record for all account\n2) Transaction Record for specific account");
+        String option = CommunicationService.readIn();
+        try{
+
+            if (option.equals("1")) {
+                return NewBank.getBank().processRequest(customerID, "TRANSACTIONRECORD");
+            }
+            else if (option.equals("2")) {
+                ArrayList<Account> accounts = showAccounts(customerID);
+                CommunicationService.sendOut("Please choose the account you want to check");
+                String account = CommunicationService.readIn();
+                try {
+                    account = accounts.get(Integer.parseInt(account)-1).getID();
+                    return NewBank.getBank().processRequest(customerID, "TRANSATIONRECORDACC "+account);
+                }catch (NumberFormatException | IndexOutOfBoundsException ne){
+                    throw new InvalidAccountException();
+                }
+            }
+            else{
+                response.setCustomer(customerID);
+                response.setResponseMessage("Invalid Input");
+                return response;
+            }
+        } catch (InvalidAmountException | InsufficientBalanceException | InvalidAccountException | InvalidUserNameException e) {
+            response.setCustomer(customerID);
+            response.setResponseMessage(e.getMessage());
+            return response;
+        }
+
+
     }
 
 }

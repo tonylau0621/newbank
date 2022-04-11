@@ -26,37 +26,44 @@ public class NewBankClientHandler extends Thread {
 	
 	public void run() {
 		// keep getting requests from the client and processing them
+		CustomerID customer = null;
 		try {
-			CustomerID customer = null;
 			String message;
 			while(true) {
-				//If not logged in, ask customer to login
-				CommunicationService.cleanTerminal();
-				Response response = null;
-				if (customer == null){
-					customer = welcomePage();
-				} else if (customer != null && customer.isAdmin()) {
-					// go to admin menu
-					out.println("Hello, " + customer.getKey() +".\n\nWhat would you like to do today? \n\n 1) Unlock User \n 2) Logout");
-					String request = in.readLine();
-					out.println("Processing admin request...");
-					response = sendAdminRequest(customer, request);
-					customer = response.getCustomer();
-					message = response.getResponseMessage();
-					out.println(message);
-					out.println("Press enter to continue");
-					request = in.readLine();
-				} else {
-					//Show other service if logged in
-					out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment" +
-									"\n 4) Create New Account\n 5) View Transaction History\n 6) Handle Loans\n 7) Logout");
-					String request = in.readLine();
-					response = sendRequest(customer, request);
-					customer = response.getCustomer();
-					message = response.getResponseMessage();
-					out.println(message);
-					out.println("Press enter to go back to main menu.");
-					request = in.readLine();
+				try {
+					//If not logged in, ask customer to login
+					CommunicationService.cleanTerminal();
+					Response response = null;
+					if (customer == null){
+						CommunicationService.removeTimeout();
+						customer = welcomePage();
+						CommunicationService.setTimeout();
+					} else if (customer != null && customer.isAdmin()) {
+						// go to admin menu
+						out.println("Hello, " + customer.getKey() +".\n\nWhat would you like to do today? \n\n 1) Unlock User \n 2) Logout");
+						String request = CommunicationService.readIn();
+						out.println("Processing admin request...");
+						response = sendAdminRequest(customer, request);
+						customer = response.getCustomer();
+						message = response.getResponseMessage();
+						out.println(message);
+						out.println("Press enter to continue");
+						request = CommunicationService.readIn();
+					} else {
+						//Show other service if logged in
+						out.println("Hello, " + bank.getCustomer(customer).getFirstName() +".\n\nWhat would you like to do today? \n\n 1) Show Account\n 2) Transfer Money to other Account\n 3) Make Payment" +
+								"\n 4) Create New Account\n 5) View Transaction History\n 6) Handle Loans\n 7) Logout");
+						String request = CommunicationService.readIn();
+						response = sendRequest(customer, request);
+						customer = response.getCustomer();
+						message = response.getResponseMessage();
+						out.println(message);
+						out.println("Press enter to go back to main menu.");
+						request = CommunicationService.readIn();
+					}
+				} catch (SessionTimeoutException e) {
+					customer = null;
+					CommunicationService.sendOut(e.getMessage());
 				}
 			}
 		} catch (IOException | InterruptedException e) {
@@ -80,7 +87,7 @@ public class NewBankClientHandler extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+	public Response sendRequest(CustomerID customer, String request) throws IOException, InterruptedException, SessionTimeoutException {
 		String toSend = "";
 		switch(request){
 			case "1":
@@ -93,8 +100,7 @@ public class NewBankClientHandler extends Thread {
 			case "4":
 				return UserService.newAccount(customer);
 			case "5":
-				toSend = "TRANSACTIONRECORD";
-				break;
+				return UserService.transaction(customer);
 			case "6":
 				return UserService.loan(customer);
 			case "7":
@@ -121,7 +127,7 @@ public class NewBankClientHandler extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException{
+	public Response sendAdminRequest(CustomerID customer, String request) throws IOException, InterruptedException, SessionTimeoutException {
 		String toSend = "";
 		switch(request){
 			case "1":
@@ -147,9 +153,9 @@ public class NewBankClientHandler extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private CustomerID welcomePage() throws IOException, InterruptedException{
+	private CustomerID welcomePage() throws IOException, InterruptedException, SessionTimeoutException {
 		out.println("Welcome to [bank name]\nTo login, Please login or create new user account\n 1) Login\n 2) New User Account");
-		String input = in.readLine();
+		String input = CommunicationService.readIn();
 		if (input.equals("1")){
 			return UserService.login();
 		}
@@ -159,11 +165,8 @@ public class NewBankClientHandler extends Thread {
 				String message = response.getResponseMessage();
 				out.println(message);
 				out.println("Press enter to go back to main menu.");
-				input = in.readLine();
+				input = CommunicationService.readIn();
 			}
-		}
-		else if (input.equals("adminLogin")){
-			return AdminService.login();
 		}
 		return null;
 	}
