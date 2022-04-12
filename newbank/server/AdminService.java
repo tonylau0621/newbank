@@ -15,7 +15,7 @@ public class AdminService {
    * @throws IOException
    * @throws InterruptedException
    */
-  public static CustomerID login() throws IOException, InterruptedException {
+  public static CustomerID login() throws IOException, InterruptedException, SessionTimeoutException {
     CommunicationService.sendOut("Enter Username");
     String userName = CommunicationService.readIn();
     // ask for password

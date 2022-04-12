@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.xml.crypto.Data;
+
 /**
  * The NewBank class is the main class of the server.
  * It contains all of the data structures and methods of the bank.
@@ -87,16 +89,17 @@ public class NewBank {
 	 * @throws MaxLoginAttemptReachException
 	 */
   public synchronized CustomerID checkLogInDetails(String userName, String password) throws InvalidUserNameException, InvalidPasswordException, MaxLoginAttemptReachException {
-    boolean isValidUserName = (customers.containsKey(userName));
+    boolean isValidUserName = (customers.containsKey(userName) || admins.containsKey(userName));
     if(!isValidUserName) throw new InvalidUserNameException();
     if(UserService.userMapByLoginAttempt.containsKey(userName)) {
       Integer userLoginAttempt = UserService.userMapByLoginAttempt.get(userName);
       if(userLoginAttempt >= UserService.MAX_LOGIN_ATTEMPT) throw new MaxLoginAttemptReachException();
     }
-    Customer targetCustomer = customers.get(userName);
-    CustomerID targetCustomerId = new CustomerID(userName, false);
+    User targetCustomer = (customers.containsKey(userName)) ? customers.get(userName) : admins.get(userName);
+    Boolean isAdmin = targetCustomer instanceof Admin;
+    CustomerID targetCustomerId = new CustomerID(userName, isAdmin);
     boolean isValidPassword = (targetCustomer.checkPassword(password));
-    if(!isValidPassword) {
+    if(!isValidPassword && !isAdmin) {
       if(!UserService.userMapByLoginAttempt.containsKey(userName)) {
         UserService.userMapByLoginAttempt.put(userName, 1);
       } else {
@@ -112,7 +115,8 @@ public class NewBank {
   }
 
   /** 
-	 * Checks the input admin login details against the database by communicating with the {@link UserService}.
+	 * **THIS METHOD IS OBSOLETE DUE TO THE REFACTORING OF LOGIN FEATURE TO SUPPORT ADMIN? LOGIN**
+     * Checks the input admin login details against the database by communicating with the {@link UserService}.
 	 * This method is due to be merged with the normal checkLogInDetails method.
 	 * 
 	 * @param userName
@@ -143,7 +147,7 @@ public class NewBank {
 	 * @throws InvalidAccountException
 	 * @throws InvalidUserNameException
 	 */
-  public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException {
+  public synchronized Response processRequest(CustomerID customer, String request) throws IOException, InvalidAmountException, InsufficientBalanceException, InvalidAccountException, InvalidUserNameException, SessionTimeoutException {
     String[] requestTokens = request.split("\\s+");
     String requestFunction = requestTokens[0];
     Response response = new Response();
@@ -178,6 +182,9 @@ public class NewBank {
       case "TRANSACTIONRECORD":
         response.setResponseMessage(getTransactionRecord(customer));
         return response;
+      case "TRANSATIONRECORDACC":
+        response.setResponseMessage(getTransactionRecord(requestTokens[1]));
+        return response;
       case "UNLOCKUSER":
         response.setResponseMessage(UserService.unlockUser());
         return response;
@@ -205,6 +212,10 @@ public class NewBank {
           return response;
         }
         break;
+      case "TERMINATE":
+      case "":
+          response.setResponseMessage("session timeout");
+          return response;
       default : {
         response.setResponseMessage("Invalid Input");
         return response;
@@ -422,6 +433,24 @@ public class NewBank {
     return result;
   }
 
+    /** 
+	 * @param customer,account
+	 * @return String
+	 */
+  private String getTransactionRecord(String account){
+    ArrayList<Transaction> transactionRecord = getLast10Transactions(account);
+    String result;
+    DateTimeFormatter datetime = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
+    if (transactionRecord.size() == 0){
+      return "No record found";
+    }else{
+      result = "Date       Time  Type     From       To         Amount\n";
+      for (Transaction t : transactionRecord){
+        result += datetime.format(t.getDT()) +" "+t.getType()+" "+t.getFrom()+" "+t.getTo()+" "+ String.valueOf(t.getAmount())+ "\n";
+      }
+    }
+    return result;
+  }
   /** 
 	 * @param customer
 	 * @return ArrayList<Transaction>
@@ -432,6 +461,22 @@ public class NewBank {
     ArrayList<Transaction> result = new ArrayList<>();
     for (int i = 0; i < transactions.size(); i++){
       if (transactions.get(i).getFrom().split("-")[0].equals(userID) || transactions.get(i).getTo().split("-")[0].equals(userID)){
+        result.add(transactions.get(i));
+      }
+      if (result.size() == 10) break;
+    }
+    return result;
+  }
+
+    /** 
+	 * @param customer,account
+	 * @return ArrayList<Transaction>
+	 */
+  private ArrayList<Transaction> getLast10Transactions(String account){
+    //get UserID
+    ArrayList<Transaction> result = new ArrayList<>();
+    for (int i = 0; i < transactions.size(); i++){
+      if (transactions.get(i).getFrom().equals(account) || transactions.get(i).getTo().equals(account)){
         result.add(transactions.get(i));
       }
       if (result.size() == 10) break;
