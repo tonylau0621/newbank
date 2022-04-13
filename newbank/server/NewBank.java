@@ -313,37 +313,45 @@ public class NewBank {
 	 * @param receivingAccountID
 	 * @return String
 	 */
-  private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-                           String receivingCustomerUserID, String receivingAccountID) {
-    //Account does not exist
-    Customer payer = customers.get(payingCustomer.getKey());
-    Customer receiver = NewBank.getBank().getCustomer(receivingCustomerUserID);
 
-    if (payer.getAccount(payingAccount) == null || receiver.getAccountbyID(receivingAccountID) == null) {
-      return "Please check Accounts";
-    }
-    //Customers should not be able to transfer less than 0.01
-    if(amount < 0.01) {return "Invalid amount";}
+ private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
+							 String receivingCustomerKey, String receivingAccount) throws IOException {
+		//Account does not exist
+		Customer payer = customers.get(payingCustomer.getKey());
+		Customer receiver = null;
+		for (HashMap.Entry<String, Customer> entry : customers.entrySet()){
+			if (entry.getValue().getUserID().equals(receivingCustomerKey)){
+				receiver = customers.get(entry.getKey());
+			}
+		}
+	
+		if (receiver == null || payer.getAccount(payingAccount) == null || receiver.getAccountbyID(receivingAccount) == null) {
+			return "Please check Accounts";
+
+		}
+		//Customers should not be able to transfer less than 0.01
+		if(amount < 0.01) {return "Invalid amount";}
+
+		//get Account Balance Amount
+		double balance = payer.getAccount(payingAccount).getAmount();
+		//Is there enough balance?
+		if(balance >= amount) {
+			//Adjust balance for both accounts
+			payer.getAccount(payingAccount).updateBalance(-amount);
+			receiver.getAccountbyID(receivingAccount).updateBalance(amount);
+			DataHandler.updateAccountCSV(customers);
+			addTransaction(new Transaction(payer.getAccount(payingAccount).getID(), receivingAccount, amount, "Payment "));
+			//updated_balance = payer.getAccount(payingAccount).getAmount();
+
+			//return "Payment was successful.";
+			return "Payment successful";
+		}
+		else {
+			return "Insufficient balance.";
+		}
 
 
-    //get Account Balance Amount
-    double balance = payer.getAccount(payingAccount).getAmount();
-    //Is there enough balance?
-    if(balance >= amount) {
-      //Adjust balance for both accounts
-      payer.getAccount(payingAccount).updateBalance(-amount);
-      receiver.getAccountbyID(receivingAccountID).updateBalance(amount);
-
-      //updated_balance = payer.getAccount(payingAccount).getAmount();
-
-      //return "Payment was successful.";
-      return "Payment successful";
-    }
-    else {
-      return "Insufficient balance.";
-    }
-
-  }
+	}
 
   /** 
 	 * @param id
