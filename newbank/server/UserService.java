@@ -337,7 +337,7 @@ public class UserService {
         return response;
     }
 
-    public static Response transaction(CustomerID customerID) throws IOException {
+    public static Response transaction(CustomerID customerID) throws IOException, SessionTimeoutException {
         Response response = new Response();
         CommunicationService.sendOut("1) Transaction Record for all account\n2) Transaction Record for specific account");
         String option = CommunicationService.readIn();
