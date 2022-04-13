@@ -115,17 +115,16 @@ public class UserService {
         CommunicationService.sendOut("Please choose the account you want to use for payment");
         String payingAccount = CommunicationService.readIn();
         CommunicationService.sendOut("Please input the account number you want to send money to");
-        String receivingCustomerKey = CommunicationService.readIn();
+        String receivingAccountNumber = CommunicationService.readIn();
         CommunicationService.sendOut("Please enter the amount you want to send:");
         String amount = CommunicationService.readIn();
         String request;
         try {
             try{
-                String[] temp = receivingCustomerKey.split("-");
-                if (temp.length > 2) throw new IndexOutOfBoundsException();
-                receivingCustomerKey = temp[0];
-                String receivingAccount = temp[0]+"-"+temp[1];
-                request = "PAY" + " " + amount + " " + accounts.get(Integer.parseInt(payingAccount)-1).getAccount()  + " " + receivingCustomerKey + " " + receivingAccount;
+                String[] temp = receivingAccountNumber.split("-");
+                if (temp.length != 2) throw new InvalidAccountException();
+                String receivingCustomerUserID = temp[0];
+                request = "PAY" + " " + amount + " " + accounts.get(Integer.parseInt(payingAccount)-1).getAccount()  + " " + receivingCustomerUserID + " " + receivingAccountNumber;
             }catch (NumberFormatException | IndexOutOfBoundsException ne){
                 throw new InvalidAccountException();
             }

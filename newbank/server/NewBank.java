@@ -309,10 +309,11 @@ public class NewBank {
 	 * @param amount
 	 * @param payingCustomer
 	 * @param payingAccount
-	 * @param receivingCustomerKey
-	 * @param receivingAccount
+	 * @param receivingCustomerUserID
+	 * @param receivingAccountID
 	 * @return String
 	 */
+
  private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
 							 String receivingCustomerKey, String receivingAccount) throws IOException {
 		//Account does not exist
@@ -348,6 +349,7 @@ public class NewBank {
 		else {
 			return "Insufficient balance.";
 		}
+
 
 	}
 
@@ -440,7 +442,7 @@ public class NewBank {
   }
 
     /** 
-	 * @param customer,account
+	 * @param account
 	 * @return String
 	 */
   private String getTransactionRecord(String account){
@@ -475,7 +477,7 @@ public class NewBank {
   }
 
     /** 
-	 * @param customer,account
+	 * @param account
 	 * @return ArrayList<Transaction>
 	 */
   private ArrayList<Transaction> getLast10Transactions(String account){
