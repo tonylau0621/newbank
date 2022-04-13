@@ -270,7 +270,7 @@ public class DataHandler {
                         String.valueOf(transaction.getAmount()).replace(",",separator)+","+
                         transaction.getFrom().replace(",",separator)+","+
                         transaction.getTo().replace(",",separator)+","+
-                        transaction.getType().replace(",",separator)+"\n";
+                        transaction.getType().replace(",",separator);
             line = encryption.encrypt(line) + "\n";
             writer.write(line);
         }
@@ -296,7 +296,7 @@ public class DataHandler {
                 line = String.valueOf(availableLoan.getAvailableLoanID()).replace(",",separator)+","+
                         availableLoan.getLenderUserID().replace(",",separator)+","+
                         String.valueOf(availableLoan.getAmount()).replace(",",separator)+","+
-                        String.valueOf(availableLoan.isStillAvailable()).replace(",",separator)+"\n";
+                        String.valueOf(availableLoan.isStillAvailable()).replace(",",separator);
                 line = encryption.encrypt(line) + "\n";
                 writer.write(line);
             }
@@ -323,7 +323,7 @@ public class DataHandler {
                         loan.getBorrowerUserID().replace(",",separator)+","+
                         String.valueOf(loan.getLoanAmount()).replace(",",separator)+","+
                         String.valueOf(loan.getRemainingAmount()).replace(",",separator)+","+
-                        String.valueOf(loan.isAllRepaid()).replace(",",separator)+"\n";
+                        String.valueOf(loan.isAllRepaid()).replace(",",separator);
                 line = encryption.encrypt(line) + "\n";
                 writer.write(line);
             }

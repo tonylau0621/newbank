@@ -309,17 +309,17 @@ public class NewBank {
 	 * @param amount
 	 * @param payingCustomer
 	 * @param payingAccount
-	 * @param receivingCustomerKey
-	 * @param receivingAccount
+	 * @param receivingCustomerUserID
+	 * @param receivingAccountID
 	 * @return String
 	 */
   private String payAmount(double amount, CustomerID payingCustomer, String payingAccount,
-                           String receivingCustomerKey, String receivingAccount) {
+                           String receivingCustomerUserID, String receivingAccountID) {
     //Account does not exist
     Customer payer = customers.get(payingCustomer.getKey());
-    Customer receiver = customers.get(receivingCustomerKey);
+    Customer receiver = NewBank.getBank().getCustomer(receivingCustomerUserID);
 
-    if (payer.getAccount(payingAccount) == null || receiver.getAccount(receivingAccount) == null) {
+    if (payer.getAccount(payingAccount) == null || receiver.getAccountbyID(receivingAccountID) == null) {
       return "Please check Accounts";
     }
     //Customers should not be able to transfer less than 0.01
@@ -332,7 +332,7 @@ public class NewBank {
     if(balance >= amount) {
       //Adjust balance for both accounts
       payer.getAccount(payingAccount).updateBalance(-amount);
-      receiver.getAccount(receivingAccount).updateBalance(amount);
+      receiver.getAccountbyID(receivingAccountID).updateBalance(amount);
 
       //updated_balance = payer.getAccount(payingAccount).getAmount();
 
@@ -434,7 +434,7 @@ public class NewBank {
   }
 
     /** 
-	 * @param customer,account
+	 * @param account
 	 * @return String
 	 */
   private String getTransactionRecord(String account){
@@ -469,7 +469,7 @@ public class NewBank {
   }
 
     /** 
-	 * @param customer,account
+	 * @param account
 	 * @return ArrayList<Transaction>
 	 */
   private ArrayList<Transaction> getLast10Transactions(String account){
